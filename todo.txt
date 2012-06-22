@@ -1,0 +1,16 @@
+- display ship
+- control ship rotation with keyboard
+- move the world (a square area) around the ship
+- move with acceleration (like real game) : integrate box2d
+- fire bullet with space
+- customize key
+- use a server + run 2 ships
+- detection collision : bullet + ship
+- add shield + implusion
+- add hard coded map (list(shapes))
+- collision with map
+- display points/score
+- add sound
+- display mini-radar
+- display name of pilot
+- first announce

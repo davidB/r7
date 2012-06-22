@@ -1,0 +1,105 @@
+h1. Slides
+
+{viewfile:f2pmasterclass-slides.pdf|width=1024|height=768}
+
+h1. Notes
+
+
+h2. References
+
+* Zinga games : FarmVille, CityVille etc...
+* "Old" MMOs : WOW, DAOC, Ultima Online,
+* F2P MMOs : Runes of Magic, Dark Orbit, Metin 2, Grepolis
+
+h2. Terminology
+
+* Free to play means no subscription, and only item selling (ex : The Settlers Online)
+
+* Freemium means your game has 2 modes :
+** free mode, with limited features
+** subscription based premium mode, with all features unlocked
+ex : Ogame, Dofus
+
+* F2P is more profitable than freemium (no subscription cap), except for young audience (ex : clubpenguin)
+
+h2. Designing F2P games
+
+The game designer is responsible for the monetization of features.
+Every feature put in the game has to be analyzed in terms of fun AND monetization.
+Fair play is also a consideration, because when it's not fair it's not fun, but monetization is more important.
+
+Easy way to test your game :
+- play without paying
+- play with 10€
+- play with 500€
+
+It has to be fun in all situations, but the more money you spend, the more you should enjoy the game.
+You should allow players to spend as much money as possible even on their first day.
+But be careful with payment options that can be canceled : a paypal payment may be canceled even 3 months later.
+
+h2. Metrics
+
+Metrics are the 3rd pillar of F2P game design.
+They are used to improve the rentability of the game over time, and your game life time is generally high (13 years for UO).
+It's easy to get lost in the amount of data that can be tracked, so you have to know what you are looking for.
+
+h2. Internationalization
+
+Allows you to reach an audience you wouldn't think of.
+You have to lower your specs requirements if you want to reach the largest possible audience.
+Provide as many payment options as possible : russians do not use credit cards for instance.
+
+h2. Currencies
+
+The hard currency must be tracked extremely close by.
+You have to be able to refund a player, and you may have to pay taxes on it in the future.
+Beware of hard currency transfers between players.
+
+h2. Accessibilty
+
+Reduce the loading time as much as possible, every second makes you lose users.
+The first steps in the game should be awesome, they are the most important.
+Tutorial should be disguised, but are necessary.
+Don't show everything : let the player ask other players, in order to tie him socially.
+Send a welcome email so the user knows how to get back to the game if he quits.
+
+h2. Game requirements
+
+* Player progression : everyone knows what XP means, use it
+* A lot of content : that's why MMOs work so well
+* A customizable avatar : every player wants to feel unique
+* Economy : allow trading, crafting, create an auction house
+
+h2. Asynchronous Game Design
+
+The game designer should be aware of the technical constraints behind massively multiplayer games (or have programmers around)
+This way, he can design features and systems compatible with them.
+Ex : synchronous trade is impossible
+Ex : the chat in the settlers online feels "real time", but is only updated every 10 seconds
+
+Generally, this means putting cooldowns everywhere, but you can monetize them \!
+
+h2. Social Design
+
+Social design is marketing bullshit, no game on Facebook is social. WOW is 10000 times more social than FarmVille.
+Social systems, however, are important, but more important are the connections between them, because it makes them meaningful.
+
+h2. Out of Client
+
+Elements outside the game that are extremely important :
+* community management (use hardcore players as moderators)
+* support (answers technical issues)
+* analytics (to track data)
+* e-marketing (= pay item design)
+* split the dev team in two :
+** one works on the expansions (long term developement)
+** one works on short term improvements, strongly influenced by metrics
+
+h2. Related articles
+
+* Famous article covering Teut's talk at GDC :
+[http://www.gamasutra.com/view/news/29983/GDC_Europe_To_Succeed_In_FreeToPlay_Exploit_Human_Weaknesses.php]
+* An elaborated response :
+[http://www.gamasutra.com/view/feature/6218/playing_with_fire_ethics_and_game_.php]
+* An interview of Teut regarding the importance of community management
+[http://www.gdceurope.com/news/2011/07/gdc-europe-speaker-spotlight-b.html]

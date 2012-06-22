@@ -1,0 +1,70 @@
+* control mode : human, ia, human+assistant (authorized assistant)
+* game mode :
+  * race
+  * areana
+    * 1vX, 1v1, 2v2, 3v3, 5v5
+    * last survivor
+    * max killed
+    * capture flags
+    * check point domination
+    * ...
+  * exploration (solo)
+    * find and capture check point
+* ships :
+  * basic for everyone (classic)
+  * customized
+* integration of MMO recipes :
+  * league, ranking
+  * guilde
+  * faction
+  * crafting (areana, race)
+  * by/sell
+  * xp / coins
+  * skill tree
+  * acheivements (exploration, nb wins, rank, speeder, commercant)
+  * quests (escort, protect, attack)
+* ship accessories
+  * weapon, defense : for each weapon a defense should exists
+  * weapons : bullet, locked missile, lazer, mine, droid/drone
+  * defense : shield, 'leurre', deflector, ...
+  * booster, 'retrofusees', 
+* floating items
+  * credit
+  * teleport ( keep/reverse speed)
+* ship skills
+  * armor
+  * max speed
+  * acceleration
+  * energy
+  * nb slots (for temporary bonus and by accessories)
+* crafting :
+  * area editor
+  * ship draw
+* user :
+  * carac
+    * avatar image
+    * name
+    * email
+    * ship(s) (first ship is free)
+    * credit
+    * accessories not installed on ship
+    * points, rank, .... 
+    * history (connection begin, connection end, area + action)
+  * guest :
+    * state keep + available during 24H*7
+    * state keep but available only if account become subscribtion during 24H*14
+    * state remove (after 24H*15)
+  * subscriber : state, wins,... are persisted (1 year after last connection)
+  * ability to convert guest to subscriber
+  * cost : 4.5 euro per 3 month
+* website :
+ * play
+ * rules
+ * install (navigator, audio setup (mumble),...)
+ * help/forum
+ * media (screenshot, video, arts, music)
+ * maps
+ * user info
+ * scoring/ranking
+ * crafting : ia, ...
+
