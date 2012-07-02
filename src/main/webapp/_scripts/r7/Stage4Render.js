@@ -150,14 +150,17 @@ define(['THREE', 'console', 'r7/evt', 'r7/models', 'webglDetector', 'underscore'
       areaBox.y0 = areaBox.y0 * wall.scale.y + wall.position.y;
       areaBox.x1 = areaBox.x1 * wall.scale.x + wall.position.x;
       areaBox.y1 = areaBox.y1 * wall.scale.y + wall.position.y;
-  
+ /* 
       var areaObj = new THREE.Mesh( new THREE.PlaneGeometry( areaBox.x1 - areaBox.x0, areaBox.y1 - areaBox.y0 ), new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
       areaObj.position.x = areaBox.x0 + (areaBox.x1 - areaBox.x0)/2;
       areaObj.position.y = areaBox.y0 + (areaBox.y1 - areaBox.y0)/2;
+      areaObj.position.z = -1; //vertices[0].z - 0.01;
       areaObj.doubleSided = true;
       //TODO rotate x 90°
+      areaObj.rotation.x = Math.PI/2;
       console.log('areaObj', areaObj);
 			_scene.add( areaObj );
+*/			
       //spawnAxis();
     };
 /*
