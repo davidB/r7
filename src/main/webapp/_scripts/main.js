@@ -43,15 +43,15 @@ define('r7/timer', [], function(){
 define('main', ['r7/Ring', 'r7/evt', 'r7/timer', 'r7/Stage4Stats', 'r7/Stage4UserInput', 'r7/Stage4Loaders', 'r7/Stage4Render','r7/Stage4Physics', 'r7/Position','THREE', 'r7/Stage4DatGui'], function(Ring, evt, timer, Stage4Stats, Stage4UserInput, Stage4Loaders, Stage4Render, Stage4Physics, Position, THREE, Stage4DatGui) {
 
   return function(){
-    var container = window.document.body;
+    var container = window.document.getElementById('layers');
 
     var ring = Ring([
-      Stage4UserInput(container).onEvent,
+      Stage4UserInput(window.document.body).onEvent,
       Stage4Loaders().onEvent,
       Stage4Physics().onEvent,
       Stage4Render(container).onEvent,
-      Stage4DatGui().onEvent,
-      Stage4Stats(container).onEvent
+//      Stage4Stats(window.document.body).onEvent,
+      Stage4DatGui().onEvent
     ]);
     ring.push(evt.Start());
     var loop = function() {

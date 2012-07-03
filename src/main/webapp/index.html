@@ -7,25 +7,44 @@
     <script data-main="_scripts/main" src="_vendors/requirejs/2.0.1/require.js"></script>
   <style>
     html, body {
-      width: 100%;
-      height: 100%;
+      width: 95%;
+      height: 95%;
+      background-color: #000000;
+    }
+    * {
       margin: 0;
       padding: 0;
-      background-color: #000000;
+      border: 0;
+    }
+    #game_area {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+    #game_area #layers, #game_area #layers canvas{
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
     }
     #info {
 			position: absolute;
-			top: 0px; width: 100%;
+			top: 0px; width: 90%;
 			padding: 5px;
 		} 
   </style>
 </head>
 <body>
   <noscript>
-   <p style="color: #ff0000">
-     Sorry, you need Javascript in order to view this web app. 
-     Please enable it in your browser settings.
-   </p>
-</noscript>
+    <p style="color: #ff0000">
+      Sorry, you need Javascript in order to view this web app. 
+      Please enable it in your browser settings.
+    </p>
+  </noscript>
+  <div id="game_area">
+    <div id="layers">
+    </div>
+  </div>
 </body>
 </html>
