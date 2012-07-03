@@ -1,7 +1,8 @@
-define(['THREE', 'console', 'r7/evt', 'r7/models', 'webglDetector', 'underscore'], function(THREE, console, evt, models, webglDetector, _) {
+define(['THREE', 'console', 'r7/evt', 'r7/models', 'webglDetector', 'underscore', 'r7/cameraMode2D'], function(THREE, console, evt, models, webglDetector, _, cameraConstraint) {
   return function(container) {
 
     var _scene = new THREE.Scene();
+    var _areaBox = null;
     var _cube = null;
     var w = container.clientWidth;
     var h = container.clientHeight;
@@ -71,9 +72,9 @@ define(['THREE', 'console', 'r7/evt', 'r7/models', 'webglDetector', 'underscore'
       spawnAxis();
       return evt.SetupDatGui(function(gui) {
           var f2 = gui.addFolder('Camera');
-          f2.add(_camera.position, 'x').min(-300).max(300);
-          f2.add(_camera.position, 'y').min(-300).max(300);
-          f2.add(_camera.position, 'z').min(-300).max(300);
+          f2.add(_camera.position, 'x');
+          f2.add(_camera.position, 'y');
+          f2.add(_camera.position, 'z');
 //          .onFinishChange(function(){
 //            var e = evt.AskValueOf(timer.t(), 'scale', self, function(v) { return _params['scale'];});
 //            _pending.push(e);
@@ -92,8 +93,15 @@ define(['THREE', 'console', 'r7/evt', 'r7/models', 'webglDetector', 'underscore'
       //console.log(_camera.position.z);
       // you need to update lookAt every frame
       if (!!_renderer && !!_scene && !!_camera) {
-        _camera.lookAt(_scene.position);
-        _renderer.render(_scene, _camera);
+        //TODO optim apply cameraConstraint only on MoveObjectTo,...
+        var obj = _scene.getChildByName('ship-1', false);
+          //console.log("cccc", obj, _areaBox);
+        if (!!obj && !!_areaBox) {
+          cameraConstraint(obj.position, _camera.position.z, _camera, _areaBox);
+        } else {
+          _camera.lookAt(_scene.position);
+        }
+       _renderer.render(_scene, _camera);
       }
     };
  
@@ -138,29 +146,29 @@ define(['THREE', 'console', 'r7/evt', 'r7/models', 'webglDetector', 'underscore'
 
       var wall = scene3d.objects.wall;
       var vertices = wall.geometry.vertices;
-      var areaBox = _.reduce(vertices, function(acc, v){
-        acc.x0 = Math.min(acc.x0, v.x);
-        acc.y0 = Math.min(acc.y0, v.y);
-        acc.x1 = Math.max(acc.x1, v.x);
-        acc.y1 = Math.max(acc.y1, v.y);
+      _areaBox = _.reduce(vertices, function(acc, v){
+        acc.xmin = Math.min(acc.xmin, v.x);
+        acc.ymin = Math.min(acc.ymin, v.y);
+        acc.xmax = Math.max(acc.xmax, v.x);
+        acc.ymax = Math.max(acc.ymax, v.y);
         return acc;
-      }, {x0 : vertices[0].x, y0 : vertices[0].y, x1 : vertices[0].x, y1 : vertices[0].y});
+      }, {xmin : vertices[0].x, ymin : vertices[0].y, xmax : vertices[0].x, ymax : vertices[0].y});
 
-      areaBox.x0 = areaBox.x0 * wall.scale.x + wall.position.x;
-      areaBox.y0 = areaBox.y0 * wall.scale.y + wall.position.y;
-      areaBox.x1 = areaBox.x1 * wall.scale.x + wall.position.x;
-      areaBox.y1 = areaBox.y1 * wall.scale.y + wall.position.y;
- /* 
-      var areaObj = new THREE.Mesh( new THREE.PlaneGeometry( areaBox.x1 - areaBox.x0, areaBox.y1 - areaBox.y0 ), new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
-      areaObj.position.x = areaBox.x0 + (areaBox.x1 - areaBox.x0)/2;
-      areaObj.position.y = areaBox.y0 + (areaBox.y1 - areaBox.y0)/2;
+      _areaBox.xmin = _areaBox.xmin * wall.scale.x + wall.position.x;
+      _areaBox.ymin = _areaBox.ymin * wall.scale.y + wall.position.y;
+      _areaBox.xmax = _areaBox.xmax * wall.scale.x + wall.position.x;
+      _areaBox.ymax = _areaBox.ymax * wall.scale.y + wall.position.y;
+ 
+      var areaObj = new THREE.Mesh( new THREE.PlaneGeometry( _areaBox.xmax - _areaBox.xmin, _areaBox.ymax - _areaBox.ymin ), new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
+      areaObj.position.x = _areaBox.xmin + (_areaBox.xmax - _areaBox.xmin)/2;
+      areaObj.position.y = _areaBox.ymax - (_areaBox.ymax - _areaBox.ymin)/2;
       areaObj.position.z = -1; //vertices[0].z - 0.01;
       areaObj.doubleSided = true;
       //TODO rotate x 90°
       areaObj.rotation.x = Math.PI/2;
       console.log('areaObj', areaObj);
 			_scene.add( areaObj );
-*/			
+			
       //spawnAxis();
     };
 /*
