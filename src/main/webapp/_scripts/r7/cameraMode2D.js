@@ -1,11 +1,11 @@
 define([], function(){
   //TODO Optimisation memoise (area of valid camera, full result,...) or use a state object
 
-  var zmax = function(area, tanAngle) {
-    var m = function(min, max, tanAngle) {
-      return (max - min) / (2 * tanAngle);
+  var zmax = function(area, tanAngle, aspect) {
+    var m = function(lg, tanAngle) {
+      return lg / (2 * tanAngle);
     };
-    return Math.min(m(area.xmin, area.xmax, tanAngle), m(area.ymin, area.ymax, tanAngle));
+    return Math.min(m((area.xmax - area.xmin)/aspect, tanAngle), m((area.ymax - area.ymin), tanAngle));
   };
 
   /**
@@ -16,10 +16,11 @@ define([], function(){
    */
   var follow = function(target, distance, camera, area){
     var tanAngle = Math.abs(Math.tan(camera.fov * Math.PI /(180 * 2 ))); // half of the fov
-    var z = Math.max(0, Math.min(zmax(area, tanAngle), camera.position.z));
-    var margin = z * tanAngle;
-    var x = Math.max( area.xmin + margin, Math.min(area.xmax - margin, target.x));
-    var y = Math.max( area.ymin + margin, Math.min(area.ymax - margin, target.y));
+    var z = Math.max(0, Math.min(zmax(area, tanAngle, camera.aspect), camera.position.z));
+    var xmargin = (z * tanAngle) * camera.aspect * camera.scale.x;
+    var ymargin = z * tanAngle * camera.scale.y;
+    var x = Math.max( area.xmin + xmargin, Math.min(area.xmax - xmargin, target.x));
+    var y = Math.max( area.ymin + ymargin, Math.min(area.ymax - ymargin, target.y));
     camera.position.x = x;
     camera.position.y = y;
     camera.position.z = z;
