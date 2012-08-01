@@ -1,0 +1,28 @@
+define(['r7/evt'], function(evt){
+  /**
+   * @param {Element} container
+   */
+  return function(){
+    var self = {};
+    var _pending = [];
+
+
+    self.onEvent = function(e, out) {
+      switch(e.k) {
+        case 'ReqEvt' :
+          // no filter
+          out.push(e.e);
+          break;
+        default :
+         // pass
+      }
+      evt.moveInto(_pending, out);
+    };
+
+    return self;
+  };
+
+});
+
+  
+

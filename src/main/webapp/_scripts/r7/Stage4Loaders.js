@@ -8,13 +8,20 @@ define(['console', 'THREE', 'r7/evt', 'underscore', ], function(console, THREE, 
       switch(e.k) {
         case 'SpawnTargetG1' :
         case 'SpawnShip' :
-          if (!!e.modelId & !e.obj3d) {
+          if (!!e.modelId && (e.obj3d === null || typeof e.obj3d == 'undefined')) {
             loadObj3d(e);
           }
           break;
         case 'SpawnArea' :
-          if (!!e.modelId & !e.scene3d) {
+          if (!!e.modelId && (e.scene3d === null || typeof e.scene3d == 'undefined')) {
             loadScene(e);
+          }
+          break;
+        case 'SpawnObj' :
+          if (!!e.modelId && (e.scene3d === null || typeof e.scene3d == 'undefined')) {
+            if (e.modelId == 'bullet-01') {
+              makeSphere(e, 1.0);
+            }
           }
           break;
         default :
@@ -38,7 +45,7 @@ define(['console', 'THREE', 'r7/evt', 'underscore', ], function(console, THREE, 
       new THREE.SceneLoader().load('_models/' + e.modelId + '.scene.js?' + new Date().getTime(), function(result){
         _.each(result.objects, fixOrientation);
         e.scene3d = result;
-        console.log('spawn scene3d ', e.modelId);
+        console.debug('spawn scene3d ', e.modelId);
         _pending.push(e);
       });
     };
@@ -52,9 +59,16 @@ define(['console', 'THREE', 'r7/evt', 'underscore', ], function(console, THREE, 
         var material = geometry.materials[0];
         //TODO should create a new object or at least change the timestamp
         e.obj3d = fixOrientation(new THREE.Mesh( geometry, material ));
-        console.log('spawn obj3d ', e.modelId);
+        console.debug('spawn obj3d ', e.modelId);
         _pending.push(e);
       });
+    };
+
+    var makeSphere = function(e, r) {
+      var geometry = new THREE.CubeGeometry( r, r, r );
+      var material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: false } );
+      e.obj3d = new THREE.Mesh( geometry, material );
+      _pending.push(e);
     };
     return self;
   };

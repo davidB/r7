@@ -1,4 +1,4 @@
-define(['r7/evt'], function(evt) {
+define(['r7/evt', 'r7/Position'], function(evt, Position) {
   /**
    * @param {number} min
    * @param {number} max
@@ -12,32 +12,37 @@ define(['r7/evt'], function(evt) {
    * @param {Id} objId
    * @param {Number} level
    */
-  var newImpule = function(t, objId, level) {
-    return evt.ImpuleObj(
-      t,
+  var newImpulse = function(objId, level) {
+    return evt.ImpulseObj(
       objId,
-      randomFloat(-pi, pi), //radian
+      randomFloat(-Math.PI, Math.PI), //radian
       randomFloat(10, 50) //TODO include level in the formula
     );
   };
 
   return function() {
     var self = {};
-    var _value : Int = 1; //getter for display
-    var _objId : Id = "g1/obj/1";
-    var _timeoutAt : Timestamp = -1;
+    var _value  = 1; //getter for display
+    var _timeoutAt = -1;
+    var _shipId = '!';
+    var _targetG1Id = 'target-g1/' + (new Date().getTime());
 
     self.onEvent = function(e, out) {
       switch(e.k) {
-      //TODO case SpawnTargetG1(....) start...
-      case 'Collision' :
-        if (e.objId === _objId) {
-          onHit(t, shipId);
+      case 'SpawnShip' :
+        if (e.isLocal && _shipId === '!') {
+          _shipId = e.objId;
+          out.push(evt.SpawnTargetG1(_targetG1Id, 'targetg101', Position(0.0, 0.0, 1.0))); //TODO random position near ship
+        }
+        break;
+      case 'BeginContact' :
+        if (e.objId0 === _shipId && e.objId1.indexOf('target-g1/') === 0) {
+          evt.moveInto(onHit(e.objId0), out);
         }
         break;
       case 'Render' :
         if (e.t >= _timeoutAt && _timeoutAt > 0) {
-          out.push.apply(out, onTimeout(t));
+          evt.moveInto(onTimeout(), out);
         }
         break;
       default :
@@ -49,22 +54,22 @@ define(['r7/evt'], function(evt) {
       _value = 1;
     };
 
-    var onHit = function(t, shipId) {
+    var onHit = function(shipId) {
       var back = [];
-      back.push(evt.ScoreG1Add(t, shipId, _value));
+      back.push(evt.ReqEvt(evt.IncVal(shipId + '/score', _value)));
       _value += 1;
-      back.push(requestMvt(t));
+      back.push(requestMvt());
       return back;
     };
 
-    var onTimeout = function(t) {
+    var onTimeout = function() {
       _value = Math.max(1, _value - 10);
-      return [requestMvt(t)];
+      return [requestMvt()];
     };
 
     var requestMvt = function() {
-      return newMovement(t, _objId, _value / 10);
-    }
+      return newImpulse(_targetG1Id, _value / 10);
+    };
     
     return self;
   };

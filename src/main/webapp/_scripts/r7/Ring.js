@@ -46,7 +46,21 @@ define([], function() {
           var entryJ = _ring[j];
           var lg2 = entryJ.lastOut.length;
           for (var ei = 0;  ei < lg2; ei++) {
-            entryI.call(entryI, entryJ.lastOut[ei], entryI.lastOut);
+            var evt = entryJ.lastOut[ei];
+            if (evt === null || typeof evt === 'undefined') {
+              console.warn("invalid evt", evt, ei, lg2, entryJ, entryJ.lastOut);
+              continue;
+            }
+            try {
+              entryI.call(entryI, evt, entryI.lastOut);
+            } catch (exc) {
+              console.error("failed to apply event", evt);
+              if (console.exception) {
+                console.exception(exc);
+              } else {
+                console.error(exc.message, exc.stack);
+              }
+            }
           }
         }
         nbEvents += entryI.lastOut.length;

@@ -71,6 +71,18 @@ define(['r7/Ring'], function(Ring) {
     assertThat(d.received, equalTo([EventDemo("A", 1), EventDemo("B", 1), EventDemo("C", 1), EventDemo("A", 2), EventDemo("B", 2), EventDemo("A", 2), EventDemo("B", 2)]));
 */
     });
+    it('should not forward null', function() {
+      sut.push(null);
+      expect(b.received).toEqual([]);
+      expect(c.received).toEqual([]);
+      expect(d.received).toEqual([]);
+    }); 
+    it('should not forward undefined', function() {
+      sut.push(undefined);
+      expect(b.received).toEqual([]);
+      expect(c.received).toEqual([]);
+      expect(d.received).toEqual([]);
+    });
 /*    
     it('should state the purpose', function() {
       expect(SampleModule.purpose).toBe("AMD testing");

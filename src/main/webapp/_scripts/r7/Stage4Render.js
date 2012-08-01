@@ -6,13 +6,17 @@ define(['THREE', 'console', 'r7/evt', 'r7/models', 'webglDetector', 'underscore'
     var _cube = null;
     var w = container.clientWidth;
     var h = container.clientHeight;
+    var _cameraTargetObjId = null;
 
     var _camera = new THREE.PerspectiveCamera(
       75, //             VIEW_ANGLE
       w / h, //             ASPECT
       1, //             NEAR,
-      10000 //FAR
+      100 //FAR
     );
+    //HACK to clean
+    //see http://help.dottoro.com/ljorlllt.php
+    //window.document.onresize= function(){ console.log("resize"); _camera.aspect = container.clientWidth / container.clientHeight;};
 
     _camera.position.z = 100;
     _scene.add(_camera);
@@ -53,11 +57,13 @@ define(['THREE', 'console', 'r7/evt', 'r7/models', 'webglDetector', 'underscore'
     self.onEvent = function (e, out) {
       switch(e.k) {
         case 'SpawnArea'     :
-          if (!!e.scene3d) spawnScene(e.objId, e.pos, e.scene3d);
+          if (e.scene3d !== null && typeof e.scene3d != 'undefined') spawnScene(e.objId, e.pos, e.scene3d);
           break;
-        case 'SpawnTargetG1' :      
         case 'SpawnShip'     :
-          if (!!e.obj3d) spawnObj(e.objId, e.pos, e.obj3d);
+          if (e.isLocal) _cameraTargetObjId = e.objId;
+        case 'SpawnTargetG1' :      
+        case 'SpawnObj'      :
+          if (e.obj3d !== null && typeof e.obj3d != 'undefined') spawnObj(e.objId, e.pos, e.obj3d);
           break;
         case 'MoveObjTo'     : moveObjTo(e.objId, e.pos); break;
         case 'SpawnCube'     : spawnCube(); break;
@@ -92,9 +98,9 @@ define(['THREE', 'console', 'r7/evt', 'r7/models', 'webglDetector', 'underscore'
       }
       //console.log(_camera.position.z);
       // you need to update lookAt every frame
-      if (!!_renderer && !!_scene && !!_camera) {
-        //TODO optim apply cameraConstraint only on MoveObjectTo,...
-        var obj = _scene.getChildByName('ship-1', false);
+      if (!!_renderer && !!_scene && !!_camera && !!_cameraTargetObjId) {
+        //TODO optim apply cameraCoinstraint only on MoveObjectTo,...
+        var obj = _scene.getChildByName(_cameraTargetObjId, false);
           //console.log("cccc", obj, _areaBox);
         if (!!obj && !!_areaBox) {
           cameraConstraint(obj.position, _camera.position.z, _camera, _areaBox);
@@ -112,8 +118,8 @@ define(['THREE', 'console', 'r7/evt', 'r7/models', 'webglDetector', 'underscore'
       var lineGeo = new THREE.Geometry();
       lineGeo.vertices.push(
         v(-500, 0, 0), v(500, 0, 0), v(50,0,0), v(45,5,0), v(50,0,0), v(45,-5,0),
-        v(0, -500, 0), v(0, 500, 0), v(0,50,0), v(5,45,0), v(0,50,0), v(-5,45,0)
-//        v(0, 0, -500), v(0, 0, 500), v(0,0,50), v(5,0,45), v(0,0,50), v(-5,0,45)
+        v(0, -500, 0), v(0, 500, 0), v(0,50,0), v(5,45,0), v(0,50,0), v(-5,45,0),
+        v(0, 0, -500), v(0, 0, 500), v(0,0,50), v(5,0,45), v(0,0,50), v(-5,0,45)
       );
       var lineMat = new THREE.LineBasicMaterial({
         color: 0x888888,
@@ -124,6 +130,13 @@ define(['THREE', 'console', 'r7/evt', 'r7/models', 'webglDetector', 'underscore'
       _scene.add(line);
     };
     var spawnObj = function(id, pos, obj3d) {
+      var obj = _scene.getChildByName(id, false);
+      if (obj !== null && typeof obj != 'undefined') {
+        console.warn('ignore spawnObj with exiting id', id, obj);
+        console.trace();
+        return;
+      }
+
       console.log('create in renderer', id, pos, obj3d);
       obj3d.name = id;
       obj3d.position.x = pos.x;
@@ -136,11 +149,11 @@ define(['THREE', 'console', 'r7/evt', 'r7/models', 'webglDetector', 'underscore'
     };
 
     var spawnScene = function(id, pos, scene3d) {
-      console.log(scene3d);
+      //console.log(scene3d);
       //_camera = scene3d.cameras.Camera; // if exists, Camera is the id of the object
       //_scene.add(_camera);
       //_scene = scene3d.scene;
-      console.log(scene3d.objects);
+      //console.log(scene3d.objects);
       _.each(scene3d.objects, function(obj3d) { _scene.add(obj3d); });
       _.each(scene3d.lights, function(light){ _scene.add(light); });
 
@@ -166,10 +179,8 @@ define(['THREE', 'console', 'r7/evt', 'r7/models', 'webglDetector', 'underscore'
       areaObj.doubleSided = true;
       //TODO rotate x 90°
       areaObj.rotation.x = Math.PI/2;
-      console.log('areaObj', areaObj);
+      //console.log('areaObj', areaObj);
 			_scene.add( areaObj );
-			
-      //spawnAxis();
     };
 /*
     //TODO rewrite to use JSONLoader
@@ -281,7 +292,7 @@ define(['THREE', 'console', 'r7/evt', 'r7/models', 'webglDetector', 'underscore'
       var material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
       return new THREE.Mesh( geometry, material );
     };
-  
+/*  
     var spawnTargetG1 = function(id, pos) {
       var geometry = new THREE.Geometry();
       var sprite = THREE.ImageUtils.loadTexture( "_images/sprites/disc.png" );
@@ -316,7 +327,7 @@ define(['THREE', 'console', 'r7/evt', 'r7/models', 'webglDetector', 'underscore'
        
       // scale it up        a bit
       obj.scale.x = obj.scale.y = 100;
-      */
+      *//*
       obj.name = id;
       obj.position.x = pos.x;
       obj.position.y = pos.y;
@@ -324,7 +335,7 @@ define(['THREE', 'console', 'r7/evt', 'r7/models', 'webglDetector', 'underscore'
       obj.rotation.z = pos.a;
       _scene.add(obj);
     };
-
+*/
     return self;
   };
 });

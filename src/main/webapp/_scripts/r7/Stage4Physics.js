@@ -33,6 +33,7 @@ define(['r7/evt', 'console', 'Box2D', 'r7/Vec3F', 'r7/Position', 'underscore'], 
     var self = {};
     var _world = new B2World(new B2Vec2(0, 0), true);
     var _lastTimestamp = 0;
+    var _pending = [];
   
     self.onEvent = function onEvent(e, out) {
       switch(e.k) {
@@ -62,7 +63,13 @@ define(['r7/evt', 'console', 'Box2D', 'r7/Vec3F', 'r7/Position', 'underscore'], 
         case 'RequestDirectShip' :
           setAngle(e.objId, Math.atan(acc.y/acc.x)); //TODO case div by zero
           setBoost(e.objId, Math.sqrt(acc.y * acc.y + acc.x * acc.x));
-          break;    
+          break;
+        case 'FireBullet':
+          out.push(spawnBullet(e.emitterId));
+          break;
+        case 'ImpulseObj':
+          impulseObj(e.objId, e.angle, e.force);
+          break;
         case 'SpawnTargetG1' :
           spawnTargetG1(e.objId, e.pos);
           break;
@@ -73,12 +80,34 @@ define(['r7/evt', 'console', 'Box2D', 'r7/Vec3F', 'r7/Position', 'underscore'], 
         default :
            //pass
       }
+      evt.moveInto(_pending, out);
     };
 
     var initWorld = function() {
       _fixDef.density = 1.0 * _scale;
       _fixDef.friction = 0.5;
       _fixDef.restitution = 0.2;
+
+      var listener = new Box2D.Dynamics.b2ContactListener;
+      listener.BeginContact = function(contact) {
+        var objId0 = contact.GetFixtureA().GetBody().GetUserData().id;
+        var objId1 = contact.GetFixtureB().GetBody().GetUserData().id;
+        if (!!objId0 && !!objId1 && objId0 !== objId1) {
+          if (objId0 < objId1) {
+            _pending.push(evt.BeginContact(objId0, objId1));
+          } else {
+            _pending.push(evt.BeginContact(objId1, objId0));
+          }
+        }
+      };
+      listener.EndContact = function(contact) {
+        //console.log(contact.GetFixtureA().GetBody().GetUserData());
+      };
+      listener.PostSolve = function(contact, impulse) {
+      };                   
+      listener.PreSolve = function(contact, oldManifold) {
+      };
+      _world.SetContactListener(listener);
     };
 
     var update = function(t){
@@ -139,17 +168,19 @@ define(['r7/evt', 'console', 'Box2D', 'r7/Vec3F', 'r7/Position', 'underscore'], 
     var forBody = function(id, f) {
       var b = _world.GetBodyList();
       var done = false;
+      var back = undefined;
       while(b != null && !done) {
         var ud = b.GetUserData();
         //trace(ud);
         //trace(id);
         if (!!ud && ud.id == id) { //TODO check if active ?
           done = true;
-          f(b, ud);
+          back = f(b, ud);
         } else {
           b = b.m_next;
         }
       }
+      return back;
     };
 
     var setBoost = function(shipId, state) {
@@ -177,7 +208,14 @@ define(['r7/evt', 'console', 'Box2D', 'r7/Vec3F', 'r7/Position', 'underscore'], 
         b.SetAngularVelocity( 180 * rot * _degToRad * 3); //90 deg per second
       });
     };
-
+    
+    var impulseObj = function(objId, a, force) {
+      forBody(objId, function(b, ud) {
+        var impulse = Vec3F(Math.cos(a) * force, Math.sin(a) * force, 0);
+        b.ApplyImpulse( impulse, b.GetWorldCenter() );
+        b.SetAwake(true);
+      });
+    };
     //TODO load from models
     var spawnShip = function(id, pos) {
       _bodyDef.type = B2Body.b2_dynamicBody;
@@ -321,6 +359,43 @@ obj3d.material.vertexColors = THREE.FaceColors;
       _fixDef.shape = s;
       _fixDef.density = 1.0 * _scale;
       return _world.CreateBody(_bodyDef).CreateFixture(_fixDef);
+    };
+
+    var spawnBullet = function(emitterId) {
+      console.log("spawnBullet", emitterId);
+      return forBody(emitterId, function(b, ud) {
+        var id = newId(emitterId + "-b");
+        _bodyDef.type = B2Body.b2_dynamicBody;
+        _bodyDef.position.x = b.GetPosition().x;
+        _bodyDef.position.y = b.GetPosition().y;
+        _bodyDef.angle = b.GetAngle();
+//        _bodyDef.linearDamping = 0.0;
+//        _bodyDef.angularDamping = 0.0;
+//        _bodyDef.isSensor = false;
+        _bodyDef.bullet = true;
+        _bodyDef.userData = UserData(id, 0);
+//        _bodyDef.position.x += 5;
+        //_bodyDef.linearVelocity.x = 20 * Math.cos(a);
+        //_bodyDef.linearVelocity.y = 20 * Math.sin(a);
+
+        var s = new B2CircleShape(0.2/ _scale);
+        _fixDef.shape = s;
+        _fixDef.density = 1 * _scale;
+        var b2 = _world.CreateBody(_bodyDef);
+        b2.CreateFixture(_fixDef);
+        var p = b2.GetPosition();
+        var a = b2.GetAngle();
+        console.log("bodyDef", _bodyDef, b2);
+        var force = 0.01;//0.3;//(0.1 * dt);
+        var impulse = Vec3F(Math.cos(a) * force, Math.sin(a) * force, 0);
+        b2.ApplyImpulse( impulse, b.GetWorldCenter() );
+        b2.SetAwake(true);
+        return evt.SpawnObj(id, "bullet-01",Position(p.x * _scale, p.y * _scale, a));
+      });
+    };
+
+    var newId = function(base) {
+      return base + new Date().getTime();
     };
 
     initWorld();

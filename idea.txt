@@ -68,3 +68,5 @@
  * scoring/ranking
  * crafting : ia, ...
 
+* look & feel :
+ * page design of http://alteredqualia.com/argon/

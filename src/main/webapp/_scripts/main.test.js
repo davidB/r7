@@ -3,9 +3,8 @@ require.config({
   urlArgs: "bust=" +  (new Date()).getTime(),
   enforceDefine: true,
   paths: {
-    'jquery' : '../_vendors/jquery-1.7.1.min',
-    'jasmine' : '../_vendors/jasmine/1.1.0.rc1/jasmine',
-    'jasmine-html' : '../_vendors/jasmine/1.1.0.rc1/jasmine-html'
+    'jasmine' : '../_vendors/jasmine-1.1.0.rc1/jasmine',
+    'jasmine-html' : '../_vendors/jasmine-1.1.0.rc1/jasmine-html'
   },
   shim: {
     'jasmine' : {

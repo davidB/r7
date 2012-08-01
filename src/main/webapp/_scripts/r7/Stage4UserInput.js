@@ -9,12 +9,28 @@ define(['r7/evt'], function(evt){
     var _pending = [];
 
     // use http://www.quirksmode.org/js/keys.html to test
-    var _keys = {
-      'boost' : 38, // up arrow
-      'rotLeft' : 37, // left arrow
-      'rotRight' : 39, //right arrow
-      'fire' :  32//space
-    };
+    var _keys = [
+      {
+        code : 38, // up arrow
+        start : function(){ return evt.ReqEvt(evt.BoostShipStart(_shipId)); },
+        stop : function(){ return evt.ReqEvt(evt.BoostShipStop(_shipId)); }
+      },
+      {
+        code : 37, // left arrow
+        start : function(){ return evt.ReqEvt(evt.RotateShipStart(_shipId, 1)); },
+        stop : function() { return evt.ReqEvt(evt.RotateShipStop(_shipId)); }
+      },
+      {
+        code : 39, //right arrow
+        start : function(){ return evt.ReqEvt(evt.RotateShipStart(_shipId, -1)); },
+        stop : function() { return evt.ReqEvt(evt.RotateShipStop(_shipId)); }
+      },
+      {
+        code :  32,//space
+        start : function(){ return evt.RegisterPeriodicEvt(_shipId + '-fire', 300, evt.ReqEvt(evt.FireBullet(_shipId))); },
+        stop :  function(){ return evt.UnRegisterPeriodicEvt(_shipId + '-fire'); }
+      }
+    ];
 
     self.onEvent = function(e, out) {
       switch(e.k) {
@@ -28,34 +44,21 @@ define(['r7/evt'], function(evt){
     };
 
     var onKeyDown = function(e) {
-      switch(e.keyCode) {
-        case _keys.boost : 
-          _keys.boost = - _keys.boost;
-          _pending.push(evt.BoostShipStart(_shipId));
-          break;
-        case _keys.rotLeft:
-          _keys.rotLeft = - _keys.rotLeft;
-          _pending.push(evt.RotateShipStart(_shipId, 1));
-          break;
-        case  _keys.rotRight:
-          _keys.rotRight = - _keys.rotRight;
-          _pending.push(evt.RotateShipStart(_shipId, -1));
-          break;
-      }
+      _keys.forEach(function(key){
+        if (key.code === e.keyCode) {
+          key.code = -key.code;
+          _pending.push(key.start());
+        }
+      });
     };
 
     var onKeyUp = function(e) {
-      var code = - e.keyCode;
-      if (code === _keys.boost) {
-        _keys.boost = - _keys.boost;
-        _pending.push(evt.BoostShipStop(_shipId));
-      } else if (code === _keys.rotLeft) {
-        _keys.rotLeft = - _keys.rotLeft;
-        _pending.push(evt.RotateShipStop(_shipId));
-      } else if (code === _keys.rotRight) {
-        _keys.rotRight = - _keys.rotRight;
-        _pending.push(evt.RotateShipStop(_shipId));
-      }
+      _keys.forEach(function(key){
+        if (key.code === - e.keyCode) {
+          key.code = -key.code;
+          _pending.push(key.stop());
+        }
+      });
     };
 
     var bindShipControl = function(shipId) {

@@ -1,7 +1,6 @@
 define(['r7/evt', 'r7/Position'], function(evt, Position) {
   var sut = evt;
   /** @type {Timestamp}*/
-  var t = 0;
   var id = "any-0";
   var model = "any_00";
   var requester = 'jasmine';
@@ -10,33 +9,33 @@ define(['r7/evt', 'r7/Position'], function(evt, Position) {
   //TODO test creation with inavlid params
   //TODO test creation with missing params
   describe('evt', function() {
-
+    it('should create object with kind "k" set to name of the method', function() {
+      for(p in sut) {
+        var p0 = p.toString().charAt(0);
+        if (p0 === p0.toUpperCase()) {
+          var e = sut[p].apply(sut);
+          expect(e.k).toEqual(p);
+        }
+      }
+    }); 
+    /*
     it('should allow creation of Render', function() {
-      var e = sut.Render(t);
+      var e = sut.Render(1000);
       expect(e.k).toEqual('Render');
     });
-    it('should allow creation of AskValueOf', function() {
-      var e = sut.AskValueOf(t, 'x', requester, undefined);
-      expect(e.k).toEqual('AskValueOf');
-    });
-    it('should allow creation of ReplyValueOf', function() {
-      var ask = sut.AskValueOf(t, 'x', requester, undefined)
-      var e = sut.ReplyValueOf(t, 33, ask);
-      expect(e.k).toEqual('ReplyValueOf');
-    });
     it('should allow creation of SpawnArea', function() {
-      var e = sut.SpawnArea(t, id, model);
+      var e = sut.SpawnArea(id, model);
       expect(e.k).toEqual('SpawnArea');
     });
     it('should allow creation of SpawnShip', function() {
-      var e = sut.SpawnShip(t, id, model, pos);
+      var e = sut.SpawnShip(id, model, pos);
       expect(e.k).toEqual('SpawnShip');
     });
-    it('should allow creation of Render', function() {
-      var e = sut.MoveObjTo(t, id, pos, acc);
+    it('should allow creation of MoveObjTo', function() {
+      var e = sut.MoveObjTo(id, pos, acc);
       expect(e.k).toEqual('MoveObjTo');
-      expect(e.t).toEqual(t);
     });
+    */
   });
 });
 
