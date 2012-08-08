@@ -9,7 +9,8 @@ define(['r7/evt'], function(evt){
     var _pending = [];
 
     // use http://www.quirksmode.org/js/keys.html to test
-    var _keys = [
+    var _keysNone = [];
+    var _keysUser = [
       {
         code : 38, // up arrow
         start : function(){ return evt.ReqEvt(evt.BoostShipStart(_shipId)); },
@@ -31,12 +32,20 @@ define(['r7/evt'], function(evt){
         stop :  function(){ return evt.UnRegisterPeriodicEvt(_shipId + '-fire'); }
       }
     ];
+    var _keys = _keysNone;
 
     self.onEvent = function(e, out) {
       switch(e.k) {
-        case 'SpawnShip' :
-          bindShipControl(e.objId);
+        case 'Stop' :
+        case 'Init' :
+          diseableControl();
           break;
+        case 'Start' :
+          _keys = _keysUser;
+          break;
+        case 'SpawnShip' :
+          if (e.isLocal) bindShipControl(e.objId);
+          break; 
         default :
          // pass
       }
@@ -71,6 +80,15 @@ define(['r7/evt'], function(evt){
       _container.addEventListener("keyup", onKeyUp, false);    
     };
 
+    var diseableControl = function() {
+      _keys.forEach(function(key){
+        if (key.code < 0) {
+          key.code = -key.code;
+          _pending.push(key.stop());
+        }
+      });
+      _keys = _keysNone;
+    };
     return self;
   };
 

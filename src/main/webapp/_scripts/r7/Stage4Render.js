@@ -56,6 +56,11 @@ define(['THREE', 'console', 'r7/evt', 'r7/models', 'webglDetector', 'underscore'
 
     self.onEvent = function (e, out) {
       switch(e.k) {
+        case 'Init' :
+          //TODO initialize/reset
+          break;
+        case 'Start'         : out.push(start()); break;                               
+        case 'Render'        : render(); break;
         case 'SpawnArea'     :
           if (e.scene3d !== null && typeof e.scene3d != 'undefined') spawnScene(e.objId, e.pos, e.scene3d);
           break;
@@ -67,8 +72,6 @@ define(['THREE', 'console', 'r7/evt', 'r7/models', 'webglDetector', 'underscore'
           break;
         case 'MoveObjTo'     : moveObjTo(e.objId, e.pos); break;
         case 'SpawnCube'     : spawnCube(); break;
-        case 'Render'        : render(); break;
-        case 'Start'         : out.push(start()); break;                               
         default :
          // pass
       }

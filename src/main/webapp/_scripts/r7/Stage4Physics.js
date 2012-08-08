@@ -37,6 +37,10 @@ define(['r7/evt', 'console', 'Box2D', 'r7/Vec3F', 'r7/Position', 'underscore'], 
   
     self.onEvent = function onEvent(e, out) {
       switch(e.k) {
+        case 'Init':
+          _world = new B2World(new B2Vec2(0, 0), true);
+          _pending = [];
+          break;
         case 'SpawnArea' :
           if (!!e.scene3d) spawnArea(e.objId, e.scene3d);
           break;
@@ -73,9 +77,12 @@ define(['r7/evt', 'console', 'Box2D', 'r7/Vec3F', 'r7/Position', 'underscore'], 
         case 'SpawnTargetG1' :
           spawnTargetG1(e.objId, e.pos);
           break;
-        case 'Render' :
+        case 'Tick' :
           update(e.t);
           pushStates(out);
+          if (out.length > 0) {
+            out.push(evt.Render);
+          }
           break;
         default :
            //pass
@@ -101,6 +108,15 @@ define(['r7/evt', 'console', 'Box2D', 'r7/Vec3F', 'r7/Position', 'underscore'], 
         }
       };
       listener.EndContact = function(contact) {
+        var objId0 = contact.GetFixtureA().GetBody().GetUserData().id;
+        var objId1 = contact.GetFixtureB().GetBody().GetUserData().id;
+        if (!!objId0 && !!objId1 && objId0 !== objId1) {
+          if (objId0 < objId1) {
+            _pending.push(evt.EndContact(objId0, objId1));
+          } else {
+            _pending.push(evt.EndContact(objId1, objId0));
+          }
+        }
         //console.log(contact.GetFixtureA().GetBody().GetUserData());
       };
       listener.PostSolve = function(contact, impulse) {
@@ -211,9 +227,11 @@ define(['r7/evt', 'console', 'Box2D', 'r7/Vec3F', 'r7/Position', 'underscore'], 
     
     var impulseObj = function(objId, a, force) {
       forBody(objId, function(b, ud) {
+        console.log('impulse2', objId, force, a);
         var impulse = Vec3F(Math.cos(a) * force, Math.sin(a) * force, 0);
         b.ApplyImpulse( impulse, b.GetWorldCenter() );
         b.SetAwake(true);
+        console.log(b.GetWorldCenter());
       });
     };
     //TODO load from models
@@ -236,6 +254,7 @@ define(['r7/evt', 'console', 'Box2D', 'r7/Vec3F', 'r7/Position', 'underscore'], 
       _fixDef.shape = s;
       _fixDef.density = 1.0 * _scale;
       //_world.setContactListener(WorldContactListener());
+      _fixDef.isSensor = false;
       return _world.CreateBody(_bodyDef).CreateFixture(_fixDef);
     };
 
@@ -294,6 +313,7 @@ define(['r7/evt', 'console', 'Box2D', 'r7/Vec3F', 'r7/Position', 'underscore'], 
             
           //var s = new B2EdgeShape(new B2Vec2(p0[0], p0[1]), new B2Vec2(p1[0], p1[1]));
           _fixDef.shape = s;
+          _fixDef.isSensor = false;
           body.CreateFixture(_fixDef);
         } else {
           // visual effect for the polygone (eg: change color)
@@ -352,12 +372,16 @@ obj3d.material.vertexColors = THREE.FaceColors;
       _bodyDef.position.x = pos.x /_scale;
       _bodyDef.position.y = pos.y /_scale;
       _bodyDef.angle = pos.a;
-      _bodyDef.linearDamping = 1.0;
-      _bodyDef.angularDamping = 0.31;
+      _bodyDef.fixedRotation = true;
+      //_bodyDef.linearDamping = 1.0;
+      //_bodyDef.angularDamping = 0.31;
       _bodyDef.userData = UserData(id, 0);
       var s = new B2CircleShape(1/ _scale);
       _fixDef.shape = s;
       _fixDef.density = 1.0 * _scale;
+      //_fixDef.isSensor = true; 
+      console.log("target", _fixDef);
+
       return _world.CreateBody(_bodyDef).CreateFixture(_fixDef);
     };
 
@@ -381,6 +405,7 @@ obj3d.material.vertexColors = THREE.FaceColors;
         var s = new B2CircleShape(0.2/ _scale);
         _fixDef.shape = s;
         _fixDef.density = 1 * _scale;
+        _fixDef.isSensor = false;
         var b2 = _world.CreateBody(_bodyDef);
         b2.CreateFixture(_fixDef);
         var p = b2.GetPosition();

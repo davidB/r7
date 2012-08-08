@@ -10,8 +10,10 @@ define([], function() {
         src.length = 0;
       }
     },
-    Start: function() { return {k : 'Start'}; },
-    Render: function(t) { return {k : 'Render', t: t}; },
+    Init: {k : 'Init'},
+    Start: {k : 'Start'},
+    Tick: function(t) { return {k : 'Tick', t: t}; },
+    Render: {k : 'Render'},
     /**
      * @param {Id} valueId
      * @param {Object} requester
@@ -32,6 +34,8 @@ define([], function() {
     SpawnShip:     function(objId, modelId, pos, obj3d, isLocal){ return {k: 'SpawnShip',     objId : objId, modelId : modelId, pos : pos, obj3d : obj3d, isLocal : isLocal};},
     SpawnTargetG1: function(objId, modelId, pos, obj3d){ return {k: 'SpawnTargetG1', objId : objId, modelId : modelId, pos : pos, obj3d : obj3d};},
     SpawnCube: function(){return {k: 'SpawnCube'};},
+    ShootingStart: function(emitterId) { return {k: 'ShootingStart', emitterId : emitterId}; },
+    ShootingStop: function(emitterId) { return {k: 'ShootingStop', emitterId : emitterId}; },
     FireBullet: function(emitterId) { return {k: 'FireBullet', emitterId : emitterId}; },
     SpawnObj: function(objId, modelId, pos, obj3d) { return {k: 'SpawnObj', objId : objId, modelId : modelId, pos : pos, obj3d : obj3d }; },
     MoveObjTo: function(objId, pos, acc){return {k: 'MoveObjTo', objId : objId, pos : pos, acc : acc};}, 
@@ -41,8 +45,9 @@ define([], function() {
     RotateShipStart: function(objId, angleSpeed) {return {k: 'RotateShipStart', objId : objId, angleSpeed : angleSpeed};},
     RotateShipStop: function(objId) {return {k: 'RotateShipStop', objId: objId};},
     BeginContact: function(objId0, objId1) {return {k: 'BeginContact', objId0 : objId0, objId1 : objId1};},
-    ImpulseObj: function(objId, angle, force) {return {k: 'ImpulseObj', angle: angle, force : force};},
-    Stop: function() { return {k : 'Stop'}; },
+    EndContact: function(objId0, objId1) {return {k: 'EndContact', objId0 : objId0, objId1 : objId1};},
+    ImpulseObj: function(objId, angle, force) {return {k: 'ImpulseObj', objId : objId, angle: angle, force : force};},
+    Stop: {k : 'Stop'}
   };
 });
 

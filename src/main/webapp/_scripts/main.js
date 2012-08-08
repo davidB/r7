@@ -86,7 +86,8 @@ define('main', [
       Stage4Layer2D(window.document.getElementById('layer2D')).onEvent
   //    Stage4DatGui().onEvent
     ]);
-    ring.push(evt.Start());
+    ring.push(evt.Init);
+    ring.push(evt.Start); //TODO push Start when ready and user hit star button
     var loop = function() {
       // loop on r<F10>equest animation loop
       // - it has to be at the beginning of the function
@@ -94,7 +95,7 @@ define('main', [
       //RequestAnimationFrame.request(loop);
       // note: three.js includes requestAnimationFrame shim
       requestAnimationFrame(loop);
-      ring.push(evt.Render(new Date().getTime()));
+      ring.push(evt.Tick(new Date().getTime()));
     };
 
     loop();
