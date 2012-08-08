@@ -13,6 +13,16 @@ class StageUtils {
 }
 */
 define([], function() {
+  var pushNonEmpty = function() {
+    for (var i = 0; i < arguments.length; i++) {
+      var a = arguments[i];
+      if (a === null || typeof a === 'undefined') {
+        throw ('try to push invalid value ['  + i + '] : ' + a) ;
+      }
+    }
+    return Array.prototype.push.apply(this,arguments);
+  };
+  
   /**
    * @contructor
    * @param {Array.<function(*, Array}>} stages
@@ -25,6 +35,7 @@ define([], function() {
     //pre-include noop as entry point for pushed event from outside
     var _ring = [noop].concat(stages).map(function(v){
       v.lastOut = [];
+      v.lastOut.push = pushNonEmpty;
       return v;
     });    
     self.push = function(e) {
