@@ -16,7 +16,7 @@ define(['r7/evt', 'r7/Position'], function(evt, Position) {
     return evt.ImpulseObj(
       objId,
       randomFloat(-Math.PI, Math.PI), //radian
-      randomFloat(10, 50) //TODO include level in the formula
+      randomFloat(1, 5)/10 //TODO include level in the formula
     );
   };
 
@@ -40,7 +40,7 @@ define(['r7/evt', 'r7/Position'], function(evt, Position) {
           evt.moveInto(onHit(e.objId0), out);
         }
         break;
-      case 'Render' :
+      case 'Tick' :
         if (e.t >= _timeoutAt && _timeoutAt > 0) {
           evt.moveInto(onTimeout(), out);
         }
@@ -57,12 +57,13 @@ define(['r7/evt', 'r7/Position'], function(evt, Position) {
     var onHit = function(shipId) {
       var back = [];
       back.push(evt.ReqEvt(evt.IncVal(shipId + '/score', _value)));
-      _value += 1;
+      //_value += 1;
       back.push(requestMvt());
       return back;
     };
 
     var onTimeout = function() {
+      console.log("TIMEOUT");
       _value = Math.max(1, _value - 10);
       return [requestMvt()];
     };

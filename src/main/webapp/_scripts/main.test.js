@@ -23,7 +23,8 @@ define('main.test', [
   'jasmine-html',
 	//include all specs to be run
 	'r7/evt.test',
-	'r7/Ring.test'
+	'r7/Ring.test',
+	'r7/Stage4GameRules.test'
 ], function(jasmine) {
 	//run tests
 	jasmine.getEnv().addReporter(new jasmine.TrivialReporter());
