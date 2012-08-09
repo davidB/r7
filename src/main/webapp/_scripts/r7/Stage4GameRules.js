@@ -130,8 +130,10 @@ define(['r7/evt', 'r7/Position'], function(evt, Position){
     };
 
     var updateState = function(k, v) {
-      _states[k] = v;
-      onReqEvent(evt.UpdateVal(k, v));
+      if (_states[k] !== v) {
+        _states[k] = v;
+        onReqEvent(evt.UpdateVal(k, v));
+      }
     };
 
     //TODO make testcase
