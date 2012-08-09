@@ -25,8 +25,8 @@
   * quests (escort, protect, attack)
 * ship accessories
   * weapon, defense : for each weapon a defense should exists
-  * weapons : bullet, locked missile, lazer, mine, droid/drone
-  * defense : shield, 'leurre', deflector, ...
+  * weapons : bullet, locked missile, lazer, mine, droid/drone, invisibility
+  * defense : shield, 'leurre', deflector, radar (long, short),...
   * booster, 'retrofusees', 
 * floating items
   * credit
@@ -70,3 +70,6 @@
 
 * look & feel :
  * page design of http://alteredqualia.com/argon/
+ * area with theme/ambiance, but firsts will be blank, texture unicolor
+ * ship with one texture unicolor (like a blob, slim)
+ * test some compositing/render effect (on some area) : sepia, dark, cell shading
