@@ -31,18 +31,28 @@ define([], function() {
   var Ring = function(stages){
     var self = {};
     /** @type {Array.<RingEntry>} */
-    var noop = function(e, out) {};
-    //pre-include noop as entry point for pushed event from outside
-    var _ring = [noop].concat(stages).map(function(v){
+    //var noop = function(e, out) {};
+    var forward = function(e, out) {
+      if(forward.dest !== null) forward.dest.push(e);
+    };
+    forward.dest = [];
+    //pre-include noop/forward as entry point for pushed event from outside
+    var _ring = [forward].concat(stages).map(function(v){
       v.lastOut = [];
       v.lastOut.push = pushNonEmpty;
       return v;
     });    
     self.push = function(e) {
+      self.onEvent(e, null);
+    };
+    self.onEvent = function(e, out) {
+      _ring[0].dest = out; // for forward.method
       _ring[0].lastOut.push(e);
       var nbEvents = 1;
       var i = 1;
       var lg = _ring.length;
+
+      if ( i >= lg) return;
 
       // process output of other stage until there is no event
       //TODO documentation : vs pipeline, vs bus, vs queue
