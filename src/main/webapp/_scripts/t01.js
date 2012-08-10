@@ -94,7 +94,7 @@
           .on("drag", dragstart)
 //          .on("dragend", dragend)
           ;
-        console.log("starting", _view, pointer, area);
+        //console.debug("starting", _view, pointer, area);
         pointer
         //  .transition()
 //          .data(_view)

@@ -95,7 +95,7 @@ define(['r7/evt', 'console', 'Box2D', 'r7/Vec3F', 'r7/Position', 'underscore'], 
       _fixDef.friction = 0.5;
       _fixDef.restitution = 0.2;
 
-      var listener = new Box2D.Dynamics.b2ContactListener;
+      var listener = new Box2D.Dynamics.b2ContactListener();
       listener.BeginContact = function(contact) {
         var objId0 = contact.GetFixtureA().GetBody().GetUserData().id;
         var objId1 = contact.GetFixtureB().GetBody().GetUserData().id;
@@ -117,7 +117,6 @@ define(['r7/evt', 'console', 'Box2D', 'r7/Vec3F', 'r7/Position', 'underscore'], 
             _pending.push(evt.EndContact(objId1, objId0));
           }
         }
-        //console.log(contact.GetFixtureA().GetBody().GetUserData());
       };
       listener.PostSolve = function(contact, impulse) {
       };                   
@@ -129,9 +128,9 @@ define(['r7/evt', 'console', 'Box2D', 'r7/Vec3F', 'r7/Position', 'underscore'], 
     var update = function(t){
       var stepRate = _adaptative ? (t - _lastTimestamp) / 1000 : (1 / _intervalRate);
       var b = _world.GetBodyList();
-      while(b != null) {
+      while(b !== null) {
         var ud = null;
-        if (b.IsActive() && (ud = b.GetUserData()) != null) {
+        if (b.IsActive() && (ud = b.GetUserData()) !== null) {
           updateForce(ud, b, (1 / stepRate));
         }
         b = b.m_next;
@@ -148,9 +147,9 @@ define(['r7/evt', 'console', 'Box2D', 'r7/Vec3F', 'r7/Position', 'underscore'], 
 
     var pushStates = function(out) {
       var b = _world.GetBodyList();
-      while(b != null) {
+      while(b !== null) {
         var ud = b.GetUserData();
-        if (b.IsActive() && ud != null && ud.id != null) {
+        if (b.IsActive() && ud !== null && ud.id !== null) {
           var p = b.GetPosition();
           var a = b.GetAngle();
           var force = ud.boost;//0.3;//(0.1 * dt);
@@ -160,10 +159,10 @@ define(['r7/evt', 'console', 'Box2D', 'r7/Vec3F', 'r7/Position', 'underscore'], 
         }
         b = b.m_next;
       }
-    }
+    };
 
     var updateForce = function(ud, b, dt) {
-      if (ud.boost != 0) {
+      if (ud.boost !== 0) {
         //b.wakeUp();
         // if (myBody->IsAwake() == true)
         var a = b.GetAngle();
@@ -184,8 +183,8 @@ define(['r7/evt', 'console', 'Box2D', 'r7/Vec3F', 'r7/Position', 'underscore'], 
     var forBody = function(id, f) {
       var b = _world.GetBodyList();
       var done = false;
-      var back = undefined;
-      while(b != null && !done) {
+      var back = null;
+      while(b !== null && !done) {
         var ud = b.GetUserData();
         //trace(ud);
         //trace(id);
@@ -202,7 +201,7 @@ define(['r7/evt', 'console', 'Box2D', 'r7/Vec3F', 'r7/Position', 'underscore'], 
     var setBoost = function(shipId, state) {
       console.log("setBoost", shipId);
       forBody(shipId, function(b, ud) {
-        console.log(b, b.GetPosition());
+        //console.debug(b, b.GetPosition());
         b.SetAwake(true);
         ud.boost = state?0.3 : 0.0;
       });
@@ -227,11 +226,11 @@ define(['r7/evt', 'console', 'Box2D', 'r7/Vec3F', 'r7/Position', 'underscore'], 
     
     var impulseObj = function(objId, a, force) {
       forBody(objId, function(b, ud) {
-        console.log('impulse2', objId, force, a);
+        //console.debug('impulse2', objId, force, a);
         var impulse = Vec3F(Math.cos(a) * force, Math.sin(a) * force, 0);
         b.ApplyImpulse( impulse, b.GetWorldCenter() );
         b.SetAwake(true);
-        console.log(b.GetWorldCenter());
+        //console.debug(GetWorldCenter());
       });
     };
     //TODO load from models
@@ -308,7 +307,7 @@ define(['r7/evt', 'console', 'Box2D', 'r7/Vec3F', 'r7/Position', 'underscore'], 
           face.color = new THREE.Color(0xff0000);
           }
           */
-          console.log(edges);
+          //console.debug(edges);
           var s = B2PolygonShape.AsVector(edges, edges.length);
             
           //var s = new B2EdgeShape(new B2Vec2(p0[0], p0[1]), new B2Vec2(p1[0], p1[1]));
@@ -380,13 +379,12 @@ obj3d.material.vertexColors = THREE.FaceColors;
       _fixDef.shape = s;
       _fixDef.density = 1.0 * _scale;
       //_fixDef.isSensor = true; 
-      console.log("target", _fixDef);
+      //console.debug("target", _fixDef);
 
       return _world.CreateBody(_bodyDef).CreateFixture(_fixDef);
     };
 
     var spawnBullet = function(emitterId) {
-      console.log("spawnBullet", emitterId);
       return forBody(emitterId, function(b, ud) {
         var id = newId(emitterId + "-b");
         _bodyDef.type = B2Body.b2_dynamicBody;
@@ -410,7 +408,6 @@ obj3d.material.vertexColors = THREE.FaceColors;
         b2.CreateFixture(_fixDef);
         var p = b2.GetPosition();
         var a = b2.GetAngle();
-        console.log("bodyDef", _bodyDef, b2);
         var force = 0.01;//0.3;//(0.1 * dt);
         var impulse = Vec3F(Math.cos(a) * force, Math.sin(a) * force, 0);
         b2.ApplyImpulse( impulse, b.GetWorldCenter() );

@@ -48,7 +48,7 @@ define(['r7/evt', 'domReady', 'ko', 'd3'], function(evt, domReady, ko, d3){
             var field = _viewModel[fieldName];
             if (field !== null && typeof field !== 'undefined') {
               field(e.value);
-              console.log('update', fieldName, field());
+              //console.debug('update', fieldName, field());
             }
           } else if (e.key === 'countdown') {
             var totalSec = Math.floor(e.value);

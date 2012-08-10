@@ -29,7 +29,7 @@ define(['r7/evt'], function(evt){
     };
 
     var unregisterPeriodic = function(id) {
-      console.log("unregister", id);
+      //console.debug("unregister", id);
       _tasks = _tasks.filter(function(v) { return v.id !== id;});
     };
 

@@ -42,7 +42,7 @@ define(['r7/evt', 'r7/Position'], function(evt, Position){
           onReqEvent(e.e);
           break;
         case 'BeginContact' :
-          console.log('contact', e);
+          //console.debug('contact', e);
           if (e.objId0.indexOf('area/') === 0) {
             if (e.objId1.indexOf('ship/') === 0) {
               // crash if no shield
@@ -63,7 +63,7 @@ define(['r7/evt', 'r7/Position'], function(evt, Position){
             if (delta >=  1) {
               _lastSeconde = e.t;
               if (_states.running) {
-                console.log("t", _lastSeconde, delta);
+                //console.debug("t", _lastSeconde, delta);
                 decCountdown(delta/2);
                 updateEnergy(delta);
               }
@@ -120,6 +120,7 @@ define(['r7/evt', 'r7/Position'], function(evt, Position){
               _pending.push(e);
             }
           }
+          break;
         default:
           _pending.push(e);
       }

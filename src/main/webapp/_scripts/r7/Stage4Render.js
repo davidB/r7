@@ -66,6 +66,8 @@ define(['THREE', 'console', 'r7/evt', 'r7/models', 'webglDetector', 'underscore'
           break;
         case 'SpawnShip'     :
           if (e.isLocal) _cameraTargetObjId = e.objId;
+          if (e.obj3d !== null && typeof e.obj3d != 'undefined') spawnObj(e.objId, e.pos, e.obj3d);
+          break; 
         case 'SpawnTargetG1' :      
         case 'SpawnObj'      :
           if (e.obj3d !== null && typeof e.obj3d != 'undefined') spawnObj(e.objId, e.pos, e.obj3d);
@@ -94,17 +96,14 @@ define(['THREE', 'console', 'r7/evt', 'r7/models', 'webglDetector', 'underscore'
 
     var render = function() {
       //_cameraControl.update();
-      //console.log(_scene, _camera);
       if (!!_cube) {
         _cube.rotation.x += 0.01;
         _cube.rotation.y += 0.02;
       }
-      //console.log(_camera.position.z);
       // you need to update lookAt every frame
       if (!!_renderer && !!_scene && !!_camera && !!_cameraTargetObjId) {
         //TODO optim apply cameraCoinstraint only on MoveObjectTo,...
         var obj = _scene.getChildByName(_cameraTargetObjId, false);
-          //console.log("cccc", obj, _areaBox);
         if (!!obj && !!_areaBox) {
           cameraConstraint(obj.position, _camera.position.z, _camera, _areaBox);
         } else {
@@ -140,7 +139,7 @@ define(['THREE', 'console', 'r7/evt', 'r7/models', 'webglDetector', 'underscore'
         return;
       }
 
-      console.log('create in renderer', id, pos, obj3d);
+      console.debug('create in renderer', id, pos, obj3d);
       obj3d.name = id;
       obj3d.position.x = pos.x;
       obj3d.position.y = pos.y;
@@ -152,11 +151,9 @@ define(['THREE', 'console', 'r7/evt', 'r7/models', 'webglDetector', 'underscore'
     };
 
     var spawnScene = function(id, pos, scene3d) {
-      //console.log(scene3d);
       //_camera = scene3d.cameras.Camera; // if exists, Camera is the id of the object
       //_scene.add(_camera);
       //_scene = scene3d.scene;
-      //console.log(scene3d.objects);
       _.each(scene3d.objects, function(obj3d) { _scene.add(obj3d); });
       _.each(scene3d.lights, function(light){ _scene.add(light); });
 
@@ -182,7 +179,6 @@ define(['THREE', 'console', 'r7/evt', 'r7/models', 'webglDetector', 'underscore'
       areaObj.doubleSided = true;
       //TODO rotate x 90°
       areaObj.rotation.x = Math.PI/2;
-      //console.log('areaObj', areaObj);
 			_scene.add( areaObj );
     };
 /*
@@ -263,7 +259,7 @@ define(['THREE', 'console', 'r7/evt', 'r7/models', 'webglDetector', 'underscore'
 */
     var moveObjTo = function(objId, pos) {
       var obj = _scene.getChildByName(objId, false);
-      if (obj != null) {
+      if (obj !== null && typeof obj !== 'undefined') {
         obj.position.x = pos.x;
         obj.position.y = pos.y;
         obj.rotation.z = pos.a;
@@ -310,7 +306,7 @@ define(['THREE', 'console', 'r7/evt', 'r7/models', 'webglDetector', 'underscore'
       material.color.setHSV( 1.0, 0.2, 0.8 );
       var obj = new THREE.ParticleSystem( geometry, material );
       //particles.sortParticles = true;
-      /*
+     
       function particleRender( context ) {
          
         // we get passed a reference to the canvas context
@@ -330,7 +326,7 @@ define(['THREE', 'console', 'r7/evt', 'r7/models', 'webglDetector', 'underscore'
        
       // scale it up        a bit
       obj.scale.x = obj.scale.y = 100;
-      *//*
+     
       obj.name = id;
       obj.position.x = pos.x;
       obj.position.y = pos.y;
