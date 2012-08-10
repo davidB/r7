@@ -3,19 +3,24 @@
 1. fix gameplay bug (energy management)
 1. remove ?bust on resources on GAE
 1. split big actual Ring into dedicated Ring for UI, GamePlay
+1. move ring gamerules (include physics) in a WebWorker
 1. use Periodic Event to manage Energy, consommable ?, need for non-discret event (timeline, periodic sub-event)
 1. replace string 'ship' by 'drone' (code, doc)
 1. fire bullet with '2' and not 'spacebar'
 
 # 0.2.0
 
+1. despawn/spawn targetG1 when hit (instead of impulse)
 1. collision with wall crash the ship => management of respawn
-1. display shadow of ship
 
 # 0.3.0
 
+1. display value on targetG1
+1. display shadow of ship
 1. animations for spawn, despawn and other case (ex : ship rotate)
 1. manage animations blending ?
+1. "billboard", display information (2d) around 3d object
+1. display via billboard gain of points (+1) with an animation
 
 # 0.4.0
 
