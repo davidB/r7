@@ -1,3 +1,37 @@
+require.config({
+  baseUrl: "/_scripts",
+  urlArgs: "bust=" +  (new Date()).getTime(),
+  enforceDefine: true,
+  paths: {
+    'underscore': '../_vendors/underscore-1.3.3/underscore.min',
+    'Stats': '../_vendors/stats-r8/Stats',
+    'THREE': '../_vendors/three-r49/Three',
+    'threeCSG' : '../_vendors/threeCSG-20120615/ThreeCSG',
+    'dat' : '../_vendors/dat-gui-20111206/dat.gui.min',
+    'ko' : '../_vendors/knockout-2.1.0',
+    'Box2D' : '../_vendors/box2dweb-2.1alpha/Box2D.min',
+    'd3' : '../_vendors/d3.v2.min',
+    // polyfil
+    'webglDetector' : '../_vendors/three-r49/Detector',
+    'console' : '../_vendors/console_log',
+    'requestAnimationFrame' : '../_vendors/RequestAnimationFrame',
+    // requirejs plugins
+    'domReady' : '../_vendors/requirejs-2.0.4/domReady'
+  },
+  shim: {
+    'underscore':     { deps: [], exports: '_' },
+    'dat':            { deps: [], exports: 'dat' },
+    'THREE' :         { deps: [], exports: 'THREE' },
+    'threeCSG' :      { deps: ['THREE'], exports: 'ThreeBSP' },
+    'webglDetector' : { deps: [], exports: 'Detector'},
+    'Stats' :         { deps: [], exports: 'Stats' },
+    'd3' :            { deps: [], exports: 'd3' },
+    'Box2D' :         { deps: [], exports: 'Box2D' }
+  },
+  waitSeconds: 15,
+  locale: "fr-fr"
+});
+/*
 define('console', [], function() {
   return console;
 });
@@ -69,3 +103,9 @@ define('main', [
     loop();
   };
 });
+*/
+/*
+require(['main'], function(main){
+  main();
+});
+*/

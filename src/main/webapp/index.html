@@ -1,10 +1,11 @@
 <!doctype html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - materials - shaders [Monjori]</title>
+		<title>game 01.01 - vdrones - r7</title>
 		<meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"/>
-    <script data-main="_scripts/main" src="_vendors/requirejs-2.0.4/require.js"></script>
+    <script src="_vendors/requirejs-2.0.4/require.js"></script>
+    <script src="_scripts/requirejs.config.js"></script>
   <style>
     * {
       margin: 0;
@@ -110,5 +111,8 @@
       </div>
     </div>
   </div>
+  <script>
+    require(['main'], function(main){ main(); });
+  </script>
 </body>
 </html>
