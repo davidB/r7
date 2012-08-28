@@ -28,8 +28,8 @@ define(['r7/evt'], function(evt){
       },
       {
         code :  32,//space
-        start : function(){ return evt.RegisterPeriodicEvt(_shipId + '-fire', 300, evt.ReqEvt(evt.FireBullet(_shipId))); },
-        stop :  function(){ return evt.UnRegisterPeriodicEvt(_shipId + '-fire'); }
+        start : function(){ return evt.ReqEvt(evt.ShootingStart(_shipId)); },
+        stop :  function(){ return evt.ReqEvt(evt.ShootingStop(_shipId)); }
       }
     ];
     var _keys = _keysNone;
