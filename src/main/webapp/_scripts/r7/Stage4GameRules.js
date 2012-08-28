@@ -4,19 +4,9 @@ define(['r7/evt', 'r7/Position'], function(evt, Position){
    */
   return function(){
     var self = {};
-    var _pending = [];
-    _pending.push0 = _pending.push;
-    _pending.push = function(i) {
-      if (i === null || typeof i === 'undefined') {
-        throw new Exception("try to push :"  +i);
-      }
-      _pending.push0(i);
-    };
+    var _pending = evt.newListOfEvt();
     var _shipId = '!';
-    var _states = {
-    };
-    var _lastSeconde = -1;
-
+    var _states = evt.newStates();
 
     self.onEvent = function(e, out) {
       switch(e.k) {
@@ -34,8 +24,8 @@ define(['r7/evt', 'r7/Position'], function(evt, Position){
           updateState(_shipId + '/boosting', false);
           updateState(_shipId + '/shooting', false);
           updateState(_shipId + '/shielding', false);
-          updateState('countdown', 45);
           updateState('running', true);
+          out.push(evt.StartCountdown('countdown', 45, evt.Stop));
           out.push(evt.Render);
           break;
         case 'ReqEvt' :
@@ -56,17 +46,10 @@ define(['r7/evt', 'r7/Position'], function(evt, Position){
           //}
           break;
         case 'Tick' :
-          if (_lastSeconde === -1) {
-            _lastSeconde = e.t;
-          } else {
-            var delta = (e.t - _lastSeconde) / 500;
-            if (delta >=  1) {
-              _lastSeconde = e.t;
-              if (_states.running) {
-                //console.debug("t", _lastSeconde, delta);
-                decCountdown(delta/2);
-                updateEnergy(delta);
-              }
+          if (e.delta500 >=  1) {
+            if (_states.running) {
+              //console.debug("t", _lastSeconde, delta);
+              updateEnergy(e.delta500);
             }
           }
           // if boost decrease energy
@@ -86,8 +69,7 @@ define(['r7/evt', 'r7/Position'], function(evt, Position){
     var onReqEvent = function(e) {
       switch(e.k) {
         case 'UpdateVal':
-          _pending.push(e);
-          onUpdateState(e.key, e.value);
+          updateState(e.key, e.value);
           //ignore
           break;
         case 'IncVal':
@@ -105,7 +87,7 @@ define(['r7/evt', 'r7/Position'], function(evt, Position){
           break;
         case 'ShootingStart' :
           _pending.push(e);
-          if (e.emitterId === _shipId) _pending.push(evt.RegisterPeriodicEvt(_shipId + '-fire', 300, evt.ReqEvt(evt.FireBullet(_shipIdi))));
+          if (e.emitterId === _shipId) _pending.push(evt.RegisterPeriodicEvt(_shipId + '-fire', 300, evt.ReqEvt(evt.FireBullet(_shipId))));
           break; 
         case 'ShootingStop' :
           _pending.push(e);
@@ -126,29 +108,11 @@ define(['r7/evt', 'r7/Position'], function(evt, Position){
       }
     };
 
-    var incState = function(k, i) {
-      updateState(k, _states[k] + i);
-    };
+    var incState = function(k, v){ _states.inc(_pending, k, v, onUpdateState); };
+    var updateState = function(k, v){ _states.update(_pending, k, v, onUpdateState); };
 
-    var updateState = function(k, v) {
-      if (_states[k] !== v) {
-        _states[k] = v;
-        onReqEvent(evt.UpdateVal(k, v));
-      }
-    };
-
-    //TODO make testcase
-    var decCountdown = function(delta) {
-      var k = 'countdown';
-      var v = _states[k];
-      v = Math.max(0, v - delta);
-      updateState(k, v);
-    };
-
-    var onUpdateState = function(k, v) {
-      if (k === 'countdown' && v === 0 && _states.running) {
-        onReqEvent(evt.Stop);
-      } else if (k === _shipId + '/energy' && v === 0) {
+    var onUpdateState = function(out, k, v) {
+      if (k === _shipId + '/energy' && v === 0) {
         if (_states[_shipId + '/boosting']) onReqEvent(evt.BoostShipStop(_shipId));
       }
     };
