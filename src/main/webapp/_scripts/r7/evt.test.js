@@ -5,7 +5,7 @@ define(['r7/evt'], function(evt) {
   //TODO test creation with missing params
   describe('evt', function() {
     it('should create object with kind "k" set to name of the method', function() {
-      for(p in sut) {
+      for(var p in sut) {
         var p0 = p.toString().charAt(0);
         if (p0 === p0.toUpperCase()) {
           if (typeof sut[p] === 'function') {

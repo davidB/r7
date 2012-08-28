@@ -34,6 +34,7 @@ define('main', [
 
     ring.push(evt.Init);
     ring.push(evt.Start); //TODO push Start when ready and user hit star button
+    var lastDelta500 = -1;
     var loop = function() {
       // loop on r<F10>equest animation loop
       // - it has to be at the beginning of the function
@@ -41,7 +42,18 @@ define('main', [
       //RequestAnimationFrame.request(loop);
       // note: three.js includes requestAnimationFrame shim
       requestAnimationFrame(loop);
-      ring.push(evt.Tick(new Date().getTime()));
+      var t = new Date().getTime();
+      var delta500 = null;
+      if (lastDelta500 === -1) {
+        lastDelta500 = t;
+        delta500 = 0;
+      }
+      var d = (t - lastDelta500) / 500;
+      if (d >=  1) {
+        lastDelta500 = t;
+        delta500 = d;
+      }
+      ring.push(evt.Tick(t, delta500));
     };
 
     loop();
