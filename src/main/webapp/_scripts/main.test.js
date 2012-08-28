@@ -24,6 +24,8 @@ define('main.test', [
 	//include all specs to be run
 	'r7/evt.test',
 	'r7/Ring.test',
+	'r7/Rules4Countdown.test',
+	'r7/Rules4TargetG1.test',
 	'r7/Stage4GameRules.test'
 ], function(jasmine) {
 	//run tests
