@@ -1,20 +1,23 @@
 define([
     'r7/Ring',
-    'r7/TargetG1',
+    'r7/Rules4Countdown',
+    'r7/Rules4TargetG1',
     'r7/Stage4GameRules',
-    'r7/Stage4Physics',
-    'r7/Stage4Periodic'
+    'r7/Stage4Periodic',
+    'r7/Stage4Physics'
 ], function(
   Ring,
-  TargetG1,
+  Rules4Countdown,
+  Rules4TargetG1,
   Stage4GameRules,
-  Stage4Physics,
-  Stage4Periodic
+  Stage4Periodic,
+  Stage4Physics
 ) {
 
   return Ring([
     Stage4Periodic().onEvent,
-    TargetG1().onEvent,
+    Rules4Countdown().onEvent,
+    Rules4TargetG1().onEvent,
     Stage4GameRules().onEvent,
     Stage4Physics().onEvent
   ]);
