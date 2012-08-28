@@ -9,7 +9,7 @@ define([], function(){
   };
 
   /**
-   * @param {{x : {Number}, y : {Number}} target
+   * @param {{x : {Number}, y : {Number}}} target
    * @param {Number} distance
    * @param {Camera} camera
    * @param {{xmin : {Number}, xmax : {Number}, ymin : {Number}, ymax : {Number}}} area

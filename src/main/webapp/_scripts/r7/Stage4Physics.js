@@ -65,8 +65,8 @@ define(['r7/evt', 'console', 'Box2D', 'r7/Vec3F', 'r7/Position', 'underscore'], 
           setRotation(e.objId, 0);
           break;
         case 'RequestDirectShip' :
-          setAngle(e.objId, Math.atan(acc.y/acc.x)); //TODO case div by zero
-          setBoost(e.objId, Math.sqrt(acc.y * acc.y + acc.x * acc.x));
+          setAngle(e.objId, Math.atan(e.acc.y/e.acc.x)); //TODO case div by zero
+          setBoost(e.objId, Math.sqrt(e.acc.y * e.acc.y + e.acc.x * e.acc.x));
           break;
         case 'FireBullet':
           out.push(spawnBullet(e.emitterId));
@@ -286,8 +286,8 @@ define(['r7/evt', 'console', 'Box2D', 'r7/Vec3F', 'r7/Position', 'underscore'], 
               acc.push(v2);
             } else {
               console.warn('duplicate vertices in the Face', face, v, v2, acc[acc.length -1 ], acc[0]);
-          face.vertexColors = new THREE.Color(0xff0000);
-          face.color = new THREE.Color(0xff0000);
+              //face.vertexColors = new THREE.Color(0xff0000);
+              //face.color = new THREE.Color(0xff0000);
             }
          }
          return acc;
@@ -317,13 +317,13 @@ define(['r7/evt', 'console', 'Box2D', 'r7/Vec3F', 'r7/Position', 'underscore'], 
         } else {
           // visual effect for the polygone (eg: change color)
           console.warn('edges.length of area < 3', edges, face);
-          face.vertexColors = new THREE.Color(0xff0000);
-          face.color = new THREE.Color(0xff0000);
+          //face.vertexColors = new THREE.Color(0xff0000);
+          //face.color = new THREE.Color(0xff0000);
         }
         //  face.materialIndex = markColor;
 //obj3d.geometry.dynamic = true;
 //obj3d.geometry.__dirtyColors = true;
-obj3d.material.vertexColors = THREE.FaceColors;
+//obj3d.material.vertexColors = THREE.FaceColors;
 /*        
         // create a set of polygone (4 side but not right angle as a work around for chainEdge support not available in box2D 2.1
         // or try b2EdgeShape edgeShape;  edgeShape.Set( b2Vec2(-15,0), b2Vec2(15,0) );

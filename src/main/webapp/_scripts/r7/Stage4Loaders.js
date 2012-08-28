@@ -1,4 +1,4 @@
-define(['console', 'THREE', 'r7/evt', 'underscore', ], function(console, THREE, evt, _) {
+define(['console', 'THREE', 'r7/evt', 'underscore'], function(console, THREE, evt, _) {
 
   return function() {
     var self = {};

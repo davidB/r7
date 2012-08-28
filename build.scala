@@ -26,8 +26,9 @@ object Main {
       //, "--process_common_js_modules"
       //, "--common_js_entry_module", "src/main/webapp/_scripts/main_r7"
       //, "--externs", "src/main/webapp/_vendors/requirejs/1.0.2/require.js"
-      , "--externs", "externs_require.js"
-      , "--externs", "externs_jquery-1.7.js"
+      , "--externs", "src/main/js_externs/global.js"
+      , "--externs", "src/main/js_externs/require.js"
+      , "--externs", "src/main/js_externs/jasmine.js"
     ))
     var build = builders.pipe(
 //      builders.route(
@@ -158,7 +159,12 @@ object Compiler_GoogleClosureCompiler {
       //TODO parse options 
       //HACK create a CommandLineRunner to parse options
       class MyCommandLineRunner(args : Seq[String]) extends CommandLineRunner(args.toArray){
-        override def createOptions() = super.createOptions() // protected => public
+        override def createOptions() = {
+          val options = super.createOptions() // protected => public
+          val customPasses = getCustomPasses(options)
+          customPasses.put(CustomPassExecutionTime.BEFORE_CHECKS, new CheckDoubleEquals(getCompiler()));
+          options
+        }
         override def createExterns() = super.createExterns()
         override def createCompiler() = super.createCompiler()
       }
@@ -262,4 +268,48 @@ object Misc_Sync {
 }
 }
 
+
+
+/**
+* Checks for the presence of the == and != operators, as they are frowned upon
+* according to Appendix B of JavaScript: The Good Parts.
+*
+* @author bolinfest@gmail.com (Michael Bolin)
+*/
+object CheckDoubleEquals {
+  // Both of these DiagnosticTypes are disabled by default to demonstrate how
+  // they can be enabled via the command line.
+  /** Error to display when == is used. */
+  val NO_EQ_OPERATOR = DiagnosticType.disabled("JSC_NO_EQ_OPERATOR", "Use the === operator instead of the == operator.")
+
+  /** Error to display when != is used. */
+  val NO_NE_OPERATOR = DiagnosticType.disabled("JSC_NO_NE_OPERATOR", "Use the !== operator instead of the != operator.")
+}
+
+class CheckDoubleEquals(compiler : AbstractCompiler) extends CompilerPass {
+  override def process(externs : Node externs, root : Node) {
+    NodeTraversal.traverse(compiler, root, new FindDoubleEquals());
+  }
+
+  /**
+   * Traverses the AST looking for uses of == or !=. Upon finding one, it will
+   * report an error unless {@code @suppress {double-equals}} is present.
+   */
+  class FindDoubleEquals extends AbstractPostOrderCallback {
+    override def visit(t : NodeTraversal, n : Node, parent : Node) {
+      val typ = n.getType()
+      if (typ == Token.EQ || typ == Token.NE) {
+        val info = n.getJSDocInfo();
+        if (info != null && info.getSuppressions().contains("double-equals")) {
+          return;
+        }
+        val diagnosticType = (typ == Token.EQ) match {
+          case true => NO_EQ_OPERATOR
+          case false => NO_NE_OPERATOR
+        }
+        val error = JSError.make(t.getSourceName(), n, diagnosticType)
+        compiler.report(error);
+      }
+    }
+  }
 }

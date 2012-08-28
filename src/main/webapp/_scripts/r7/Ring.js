@@ -24,13 +24,12 @@ define([], function() {
   };
   
   /**
-   * @contructor
-   * @param {Array.<function(*, Array}>} stages
-   * @return {!Ring}
+   * @param {Array.<function(*, Array)>} stages
+   * @return {onEvent: function(*, Array<*>), push: function(*)}
+   * //return {!Ring}
    */
   var Ring = function(stages){
     var self = {};
-    /** @type {Array.<RingEntry>} */
     //var noop = function(e, out) {};
     var forward = function(e, out) {
       if(forward.dest !== null) forward.dest.push(e);

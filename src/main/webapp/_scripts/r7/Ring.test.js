@@ -5,9 +5,9 @@ define(['r7/Ring'], function(Ring) {
   };
 
   /**
-   * @constructor
    * @param {string} name
    * @param {Array.<number>} reactInt
+   * @return {{received: Array.<*>, onEvent : function(*, Array.<*>)}}
    */
   var Stage4Demo = function(name, reactInt){
     var self = {};
