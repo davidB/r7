@@ -7,11 +7,12 @@ define(['r7/evt'], function(evt) {
     it('should create object with kind "k" set to name of the method', function() {
       for(var p in sut) {
         var p0 = p.toString().charAt(0);
+        var e = {};
         if (p0 === p0.toUpperCase()) {
           if (typeof sut[p] === 'function') {
-            var e = sut[p].apply(sut);
+            e = sut[p].apply(sut);
           } else {
-            var e = sut[p];
+            e = sut[p];
           }
           expect(e.k).toEqual(p);
         }
