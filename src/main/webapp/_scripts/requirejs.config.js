@@ -6,7 +6,7 @@ require.config({
     'underscore': '../_vendors/underscore-1.3.3/underscore.min',
     'Stats': '../_vendors/stats-r8/Stats',
     //'THREE': '../_vendors/three-r49/Three',
-    'THREE': '../_vendors/three-20120815/three',
+    'THREE': '../_vendors/three/three',
     'ThreeBSP' : '../_vendors/threeCSG-20120615/ThreeCSG',
     'dat' : '../_vendors/dat-gui-20111206/dat.gui.min',
     'ko' : '../_vendors/knockout-2.1.0',
