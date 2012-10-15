@@ -21,6 +21,8 @@ define(['r7/evt', 'console', 'Box2D', 'r7/Vec3F', 'r7/Position', 'underscore'], 
   var _fixDef = new B2FixtureDef();
   var _bodyDef = new B2BodyDef();
 
+  var _id2body = {};
+
   /**
    * @constructor
    * @param {Id} id
@@ -77,12 +79,15 @@ define(['r7/evt', 'console', 'Box2D', 'r7/Vec3F', 'r7/Position', 'underscore'], 
         case 'SpawnTargetG1' :
           spawnTargetG1(e.objId, e.pos);
           break;
+        case 'DespawnObj' :
+          despawn(e.objId);
+          break;
         case 'Tick' :
           update(e.t);
           pushStates(out);
-          if (out.length > 0) {
+//          if (out.length > 0) {
             out.push(evt.Render);
-          }
+//          }
           break;
         default :
            //pass
@@ -123,6 +128,12 @@ define(['r7/evt', 'console', 'Box2D', 'r7/Vec3F', 'r7/Position', 'underscore'], 
       listener.PreSolve = function(contact, oldManifold) {
       };
       _world.SetContactListener(listener);
+    };
+
+    var despawn = function(id) {
+      forBody(id, function(b, u) {
+        _world.DestroyBody(b);
+      });
     };
 
     var update = function(t){
@@ -181,19 +192,25 @@ define(['r7/evt', 'console', 'Box2D', 'r7/Vec3F', 'r7/Position', 'underscore'], 
      * @param {function(B2Body, UserData)} f
      */
     var forBody = function(id, f) {
+      var back = null;
+      /*
       var b = _world.GetBodyList();
       var done = false;
-      var back = null;
       while(b !== null && !done) {
+      */
+      var b = _id2body[id];
+      if (b !== null && typeof b !== 'undefined') {
         var ud = b.GetUserData();
         //trace(ud);
         //trace(id);
-        if (!!ud && ud.id == id) { //TODO check if active ?
-          done = true;
+//        if (!!ud && ud.id == id) { //TODO check if active ?
+//          done = true;
           back = f(b, ud);
-        } else {
-          b = b.m_next;
-        }
+//        } else {
+//          b = b.m_next;
+//        }
+      } else {
+        console.warn('body not found : ' + id);
       }
       return back;
     };
@@ -201,7 +218,7 @@ define(['r7/evt', 'console', 'Box2D', 'r7/Vec3F', 'r7/Position', 'underscore'], 
     var setBoost = function(shipId, state) {
       console.log("setBoost", shipId);
       forBody(shipId, function(b, ud) {
-        //console.debug(b, b.GetPosition());
+        console.debug(b, b.GetPosition());
         b.SetAwake(true);
         ud.boost = state?0.3 : 0.0;
       });
@@ -254,7 +271,7 @@ define(['r7/evt', 'console', 'Box2D', 'r7/Vec3F', 'r7/Position', 'underscore'], 
       _fixDef.density = 1.0 * _scale;
       //_world.setContactListener(WorldContactListener());
       _fixDef.isSensor = false;
-      return _world.CreateBody(_bodyDef).CreateFixture(_fixDef);
+      return createBody(id, _bodyDef).CreateFixture(_fixDef);
     };
 
     //TODO load from models
@@ -366,7 +383,30 @@ define(['r7/evt', 'console', 'Box2D', 'r7/Vec3F', 'r7/Position', 'underscore'], 
       return body;      
     };
     
-    var spawnTargetG1 = function(id, pos) {
+    var findAvailablePos = function(newPos) {
+      var pos = null;
+      if  (typeof newPos === 'function') {
+        //TODO avoid infinite loop
+//        for(pos = newPos() ; isAvailable(pos) ; pos = newPos());       
+        pos = Position(0,0,0);
+      } else if (isAvailable(newPos)) {
+        pos = newPos;
+      }
+      if (pos === null) {
+        throw "Can't find available pos : " + newPos;
+      }
+      return pos;
+    };
+
+    var createBody = function(id, bodyDef) {
+      var b = _world.CreateBody(bodyDef);
+      _id2body[id] = b;
+      return b;
+    };
+
+    var spawnTargetG1 = function(id, newPos) {
+      var pos = findAvailablePos(newPos);
+
       _bodyDef.type = B2Body.b2_dynamicBody;
       _bodyDef.position.x = pos.x /_scale;
       _bodyDef.position.y = pos.y /_scale;
@@ -381,7 +421,8 @@ define(['r7/evt', 'console', 'Box2D', 'r7/Vec3F', 'r7/Position', 'underscore'], 
       //_fixDef.isSensor = true; 
       //console.debug("target", _fixDef);
 
-      return _world.CreateBody(_bodyDef).CreateFixture(_fixDef);
+      //return _world.CreateBody(_bodyDef).CreateFixture(_fixDef);
+      return createBody(id, _bodyDef).CreateFixture(_fixDef);
     };
 
     var spawnBullet = function(emitterId) {
@@ -404,7 +445,7 @@ define(['r7/evt', 'console', 'Box2D', 'r7/Vec3F', 'r7/Position', 'underscore'], 
         _fixDef.shape = s;
         _fixDef.density = 1 * _scale;
         _fixDef.isSensor = false;
-        var b2 = _world.CreateBody(_bodyDef);
+        var b2 = createBody(id, _bodyDef);
         b2.CreateFixture(_fixDef);
         var p = b2.GetPosition();
         var a = b2.GetAngle();
