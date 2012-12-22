@@ -87,5 +87,16 @@
 1. use a server + run 2 ships (try PuNub) @mutli
 
 # Backlog
+
 1. use Periodic Event to manage Energy, consommable ?, need for non-discret event (timeline, periodic sub-event)
 1. move ring gamerules (include physics) in a WebWorker
+
+# Misc
+
+1. Music
+1. Sound Effects (jsfxrt)
+1. Splash screen (loading bar + advertising / animation)
+1. Victoty/Achevement screen per user, global
+1. Scores screen (per area/level)
+1. Story
+1. Instruction/explanations/tutorial (learning curve, achivments, mission,...)
