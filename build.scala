@@ -24,26 +24,27 @@ object Main {
       , "--jscomp_off", "globalThis" // for Three.js
       , "--transform_amd_modules"
       //, "--process_common_js_modules"
-      //, "--common_js_entry_module", "src/main/webapp/_scripts/main_r7"
-      //, "--externs", "src/main/webapp/_vendors/requirejs/1.0.2/require.js"
-      , "--externs", "src/main/js_externs/global.js"
-      , "--externs", "src/main/js_externs/require.js"
-      , "--externs", "src/main/js_externs/jasmine.js"
+      //, "--common_js_entry_module", "src/webapp/_scripts/main_r7"
+      //, "--externs", "src/webapp/_vendors/requirejs/1.0.2/require.js"
+      , "--externs", "src/js_externs/global.js"
+      , "--externs", "src/js_externs/require.js"
+      , "--externs", "src/js_externs/jasmine.js"
     ))
     var build = builders.pipe(
-//      builders.route(
-//        ("glob:src/main/coffee/**.coffee", Compiler_CoffeeScript("src/main/coffee", "target/gen_js", List("--bare")))
-//      ),  
       builders.route(
-        ("glob:src/main/webapp/_scripts/**.js", closureCompiler)
-        , ("glob:target/gen_js/**.js", closureCompiler)
-        , ("glob:src/main/jade/**.jade", Compiler_Jade("src/main/jade", "target/webapp"))
-        , ("glob:src/main/webapp/**", Misc_Sync("src/main/webapp", "target/webapp"))
+        ("glob:src/webapp/_scripts/**.coffee", builders.pipe(
+          my.Compiler_CoffeeScript("src/webapp/_scripts", "target/gen_js", List("--bare"))
+        , my.Misc_Sync("target/gen_js", "target/webapp/_scripts")
+        ))
+//        ("glob:src/webapp/_scripts/**.js", closureCompiler)
+//        , ("glob:target/gen_js/**.js", closureCompiler)
+        , ("glob:src/webapp/**.jade", Compiler_Jade("src/webapp", "target/webapp"))
+        , ("glob:src/webapp/**", my.Misc_Sync("src/webapp", "target/webapp"))
       ),
       builders.route(
         ("glob:src/test/vows/**.js", my.Checker_Vows("."))
       )
-        //, JadeCompiler("src/main/jade", "glob:**/*.jade", "target/webapp"),
+        //, JadeCompiler("src/jade", "glob:**/*.jade", "target/webapp"),
         //, CoffeeScriptCompiler2("src/test/coffee", "glob:**/*.coffee", "target/webapp"),
         //, VowsRunner("src/test/coffee", "glob:**/*.js")
     )
@@ -117,17 +118,32 @@ object Compiler_CoffeeScript {
     //TODO check context (eg coffee executable existe, else warning and fallback to rhino + ...)
     //TODO return a Validation or a Logger ??
     //TODO manage Deleted 
+    //HACK group files by target directory, because coffee does not create the outputDir/sub for intput of type list of files (sub/file.coffee)
+    
+    
+
     return { apaths : builders.AnnotedPathS =>
       import scala.sys.process.Process
       var back = apaths.toList
-      val files = builders.toRelativeFilePaths(apaths, inputDir).toList
-      val dest = outputDir.toFile
-      dest.mkdirs()
-      val cmdline = "coffee" :: "-o" :: dest.getAbsolutePath :: options.toList ::: files 
-      back = AnnotedPath(Change.Modified, inputDir, Set(Marker("coffee", "cmdline :" + cmdline.mkString("'", "' '", "'"), Level.Debug))) :: back
-      val stdout: String = Process(cmdline, inputDir.toFile) !!;
-      println(stdout)
-      back
+      val iofiles = (builders.toRelativeFilePaths(apaths, inputDir)
+        .toList
+        .map{ x => (x, outputDir.resolve(x.replace(".coffee", ".js").replace(".cs", ".js")))}
+        .groupBy{ x => x._2.getParent }
+      )
+      val result = iofiles.map { case (outdir, files) =>
+        outdir.toFile.mkdirs()
+        files.foreach{ _._2.toFile.delete()}
+        val cmdline = "coffee" :: "-o" :: outdir.toAbsolutePath.toString :: options.toList ::: files.map(_._1)
+        val stdout: String = Process(cmdline, inputDir.toFile) !!;
+        //TODO parse stdout to generate result
+        println(stdout)
+        val changes = files.map{ x => x._2.toFile.exists() match {
+         case true => AnnotedPath(Change.Modified, x._2, Set())
+         case false => AnnotedPath(Change.Deleted, x._2, Set())
+        }}
+        AnnotedPath(Change.Modified, inputDir, Set(Marker("coffee", "cmdline :" + cmdline.mkString("'", "' '", "'"), Level.Debug))) :: changes
+      }
+      result.flatten ++ back
     }
   }
  //def apply(inputDir : Path, inputFilter : builders.Filter, outputDir : Path, options : Seq[String] = Nil) : builders.Builder = builders.route((inputFilter, exec(inputDir, outputDir, options)))
@@ -161,8 +177,8 @@ object Compiler_GoogleClosureCompiler {
       class MyCommandLineRunner(args : Seq[String]) extends CommandLineRunner(args.toArray){
         override def createOptions() = {
           val options = super.createOptions() // protected => public
-          val customPasses = getCustomPasses(options)
-          customPasses.put(CustomPassExecutionTime.BEFORE_CHECKS, new CheckDoubleEquals(getCompiler()));
+          //val customPasses = getCustomPasses(options)
+          //customPasses.put(CustomPassExecutionTime.BEFORE_CHECKS, new CheckDoubleEquals(getCompiler()));
           options
         }
         override def createExterns() = super.createExterns()
@@ -246,7 +262,9 @@ object Misc_Sync {
 
   // TODO implement
   def apply(inputDir : Path, outputDir : Path) : builders.Builder = { apaths : builders.AnnotedPathS =>
-    val n = for (apath <- apaths) yield {
+    println("sync", apaths.mkString("\n"))
+    val n = for (apath <- apaths ; if apath.path.startsWith(inputDir)) yield {
+ 
       val src = apath.path
       val dest = outputDir.resolve(inputDir.relativize(src))
       (src.toFile.isDirectory, apath.change) match {
@@ -276,40 +294,38 @@ object Misc_Sync {
 *
 * @author bolinfest@gmail.com (Michael Bolin)
 */
-object CheckDoubleEquals {
-  // Both of these DiagnosticTypes are disabled by default to demonstrate how
-  // they can be enabled via the command line.
-  /** Error to display when == is used. */
-  val NO_EQ_OPERATOR = DiagnosticType.disabled("JSC_NO_EQ_OPERATOR", "Use the === operator instead of the == operator.")
-
-  /** Error to display when != is used. */
-  val NO_NE_OPERATOR = DiagnosticType.disabled("JSC_NO_NE_OPERATOR", "Use the !== operator instead of the != operator.")
-}
-
-class CheckDoubleEquals(compiler : AbstractCompiler) extends CompilerPass {
-  override def process(externs : Node externs, root : Node) {
-    NodeTraversal.traverse(compiler, root, new FindDoubleEquals());
-  }
-
-  /**
-   * Traverses the AST looking for uses of == or !=. Upon finding one, it will
-   * report an error unless {@code @suppress {double-equals}} is present.
-   */
-  class FindDoubleEquals extends AbstractPostOrderCallback {
-    override def visit(t : NodeTraversal, n : Node, parent : Node) {
-      val typ = n.getType()
-      if (typ == Token.EQ || typ == Token.NE) {
-        val info = n.getJSDocInfo();
-        if (info != null && info.getSuppressions().contains("double-equals")) {
-          return;
-        }
-        val diagnosticType = (typ == Token.EQ) match {
-          case true => NO_EQ_OPERATOR
-          case false => NO_NE_OPERATOR
-        }
-        val error = JSError.make(t.getSourceName(), n, diagnosticType)
-        compiler.report(error);
-      }
-    }
-  }
+//object CheckDoubleEquals {
+//  // Both of these DiagnosticTypes are disabled by default to demonstrate how
+//  // they can be enabled via the command line.
+//  /** Error to display when == is used. */
+//  val NO_EQ_OPERATOR = DiagnosticType.disabled("JSC_NO_EQ_OPERATOR", "Use the === operator instead of the == operator.")
+//
+//  /** Error to display when != is used. */
+//  val NO_NE_OPERATOR = DiagnosticType.disabled("JSC_NO_NE_OPERATOR", "Use the !== operator instead of the != operator.")
+//}
+//
+//class CheckDoubleEquals(compiler : AbstractCompiler) extends CompilerPass {
+//  override def process(externs : Node, root : Node) {
+//    NodeTraversal.traverse(compiler, root, new FindDoubleEquals());
+//  }
+//
+//  /**
+//   * Traverses the AST looking for uses of == or !=. Upon finding one, it will
+//   * report an error unless {@code @suppress {double-equals}} is present.
+//   */
+//  class FindDoubleEquals extends AbstractPostOrderCallback {
+//    override def visit(t : NodeTraversal, n : Node, parent : Node) {
+//      val typ = n.getType()
+//      if (typ == Token.EQ || typ == Token.NE) {
+//        val info = n.getJSDocInfo();
+//        if (info != null && info.getSuppressions().contains("double-equals")) {
+//          return;
+//        }
+//        val diagnosticType = (typ == Token.EQ) ? NO_EQ_OPERATOR : NO_NE_OPERATOR
+//        val error = JSError.make(t.getSourceName(), n, diagnosticType)
+//        compiler.report(error);
+//      }
+//    }
+//  }
+//}
 }
