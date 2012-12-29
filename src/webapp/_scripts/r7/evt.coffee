@@ -54,6 +54,11 @@ define([], ()->
       k: "StopCountdown"
       key: key
     }
+    Preload : (assets, startOnComplete) -> {
+      k : "Preload"
+      assets: assets
+      startOnComplete : startOnComplete || false
+    }
     SpawnArea: (objId, modelId, pos, scene3d) -> {
       k: "SpawnArea"
       objId: objId

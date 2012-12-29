@@ -25,8 +25,12 @@ require.config({
       '../_vendors/jquery-1.7.1/jquery-1.7.1.min'
     ],
     'bootstrap' : '../_vendors/bootstrap/js/bootstrap.min',
+    'preloadjs' : [
+      'http://code.createjs.com/preloadjs-0.2.0.min',
+      '../_vendors/preloadjs-0.2.0/preloadjs-0.2.0.min'
+    ],
     // polyfil
-    'webglDetector' : '../_vendors/three-r49/Detector',
+    'webglDetector' : '../_vendors/three-r53/Detector',
     'console' : '../_vendors/console_log',
     'requestAnimationFrame' : '../_vendors/RequestAnimationFrame',
     // test
@@ -46,6 +50,7 @@ require.config({
     'Stats' :         { deps: [], exports: 'Stats' },
     'd3' :            { deps: [], exports: 'd3' },
     'Box2D' :         { deps: [], exports: 'Box2D' },
+    'preloadjs':      { deps: [], exports: 'createjs.PreloadJS'},
     'jasmine' :       { deps: [], exports: 'jasmine'},
     'jasmine-html' :  { deps: ['jasmine'], exports: 'jasmine.TrivialReporter'}
   },

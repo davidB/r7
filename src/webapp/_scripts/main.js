@@ -35,14 +35,13 @@ define('main', [
 
   return function(){
     var container = window.document.getElementById('layers');
-    console.log(">>>>>>>>>>>>>>>>>> main");
     var ring = Ring([
       ui(container).onEvent,
       rules.onEvent
     ]);
 
     ring.push(evt.Init);
-    ring.push(evt.Start); //TODO push Start when ready and user hit star button
+    //ring.push(evt.Start); //TODO push Start when ready and user hit star button
     var lastDelta500 = -1;
     var loop = function() {
       // loop on r<F10>equest animation loop

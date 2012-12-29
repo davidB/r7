@@ -1,9 +1,40 @@
-define(["console", "THREE", "r7/evt", "underscore"], (console, THREE, evt, _) ->
+define(["console", "THREE", "r7/evt", "underscore", 'preloadjs'], (console, THREE, evt, _, PreloadJS) ->
   ->
     self = {}
     _pending = []
+
+    _waitingStart = false
+    preload = new PreloadJS()
+    preload.onFileLoad = (e) -> console.log("preload onFileLoad", e)
+    preload.onProgress = (e) ->
+      console.log("preload onProgress", e)
+      if (e.loaded == e.total) and _waitingStart
+        console.log(">>>>>>>>>>>>>>>>>> push start")
+        _pending.push(evt.Start)
+        _waitingStart = false
+    preload.onFileProgress = (e) -> console.log("preload onFileProgress", e)
+    preload.onError = (e) -> console.error("preload onError", e)
+    preload.setMaxConnections(5)
+    preload.initialize(true)
+    preload.load()
+
     self.onEvent = onEvent = (e, out) ->
       switch e.k
+        when 'Init'
+          preload.close()
+        when 'Preload'
+          manifest = e.assets.map((a) -> switch a.kind
+            when 'scene'
+              { id : a.id, type : PreloadJS.JSON, src: a.src || '_models/' + a.id + '.scene.js' }
+            when 'model'
+              { id : a.id, type : PreloadJS.JSON, src : a.src || '_models/' + a.id + '.js' }
+            when 'hud'
+              { id : a.id, type : PreloadJS.SVG, src : a.src || '_images/' + a.id + '.svg' }
+            else
+              { id : a.id, src : a.src}
+          )
+          _waitingStart = true if (e.startOnComplete)
+          preload.loadManifest(manifest, true)
         when "SpawnTargetG1", "SpawnShip"
           loadObj3d(e)  if !!e.modelId and (not e.obj3d?)
         when "SpawnArea"
@@ -11,8 +42,7 @@ define(["console", "THREE", "r7/evt", "underscore"], (console, THREE, evt, _) ->
         when "SpawnObj"
           makeSphere(e, 1.0) if e.modelId is "bullet-01"  if !!e.modelId and (not e.scene3d?)
         else
-
-      #pass
+          #pass
       evt.moveInto(_pending, out)
 
 
@@ -28,15 +58,20 @@ define(["console", "THREE", "r7/evt", "underscore"], (console, THREE, evt, _) ->
       obj3d
 
     loadScene = (e) ->
-      new THREE.SceneLoader().load("_models/" + e.modelId + ".scene.js?" + new Date().getTime(), (result) ->
+      d = preload.getResult(e.modelId)
+      console.log("loadScene", d)
+      new THREE.SceneLoader().parse(JSON.parse(d.result), (result) ->
         _.each(result.objects, fixOrientation)
         e.scene3d = result
         console.debug("spawn scene3d ", e.modelId)
         _pending.push(e)
-      )
+      , d.src)
 
     loadObj3d = (e) ->
-      new THREE.JSONLoader().load("_models/" + e.modelId + ".js?" + new Date().getTime(), (geometry, materials) ->
+      loader = new THREE.JSONLoader()
+      d = preload.getResult(e.modelId)
+      texturePath = loader.extractUrlBase( d.src )
+      loader.createModel(JSON.parse(d.result), (geometry, materials) ->
 
         #var material = new THREE.MeshNormalMaterial();
         #var material = new THREE.MeshNormalMaterial( { shading: THREE.SmoothShading } );
@@ -48,7 +83,7 @@ define(["console", "THREE", "r7/evt", "underscore"], (console, THREE, evt, _) ->
         e.obj3d = fixOrientation(new THREE.Mesh(geometry, new THREE.MeshFaceMaterial(materials)))
         console.debug("spawn obj3d ", e.modelId)
         _pending.push(e)
-      )
+      , texturePath)
 
     makeSphere = (e, r) ->
       geometry = new THREE.CubeGeometry(r, r, r)

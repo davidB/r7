@@ -1,65 +1,5 @@
-{
-  "type": "block",
-  "src": "{",
-  "value": "{",
-  "lineno": 39,
-  "children": [],
-  "varDecls": [],
-  "labels": {
-    "table": {},
-    "size": 0
-  },
-  "functions": [],
-  "nonfunctions": [],
-  "transformed": true
-}
-{
-  "type": "block",
-  "src": "{",
-  "value": "{",
-  "lineno": 39,
-  "children": [],
-  "varDecls": [],
-  "labels": {
-    "table": {},
-    "size": 0
-  },
-  "functions": [],
-  "nonfunctions": [],
-  "transformed": true
-}
-{
-  "type": "block",
-  "src": "{",
-  "value": "{",
-  "lineno": 39,
-  "children": [],
-  "varDecls": [],
-  "labels": {
-    "table": {},
-    "size": 0
-  },
-  "functions": [],
-  "nonfunctions": [],
-  "transformed": true
-}
-{
-  "type": "block",
-  "src": "{",
-  "value": "{",
-  "lineno": 39,
-  "children": [],
-  "varDecls": [],
-  "labels": {
-    "table": {},
-    "size": 0
-  },
-  "functions": [],
-  "nonfunctions": [],
-  "transformed": true
-}
 define ["r7/evt", "r7/Position"], (evt, Position) ->
-  
+
   ###
   @param {Element} container
   ###
@@ -72,12 +12,17 @@ define ["r7/evt", "r7/Position"], (evt, Position) ->
       switch e.k
         when "Init"
           uid = new Date().getTime()
+          out.push( evt.Preload([
+            {kind : 'scene', id : 'area01'},
+            {kind : 'model', id : 'ship01'},
+            {kind : 'hud',   id : 'gui'}
+          ], true))
+        when "Start"
           out.push evt.SpawnCube()
           out.push evt.SpawnArea("area/" + uid, "area01", Position(0.0, 0.0, 0.0))
           _shipId = "ship/" + (uid + 1)
           out.push evt.SpawnShip(_shipId, "ship01", Position(0.0, 0.0, 0.5), null, true)
           updateState "running", false
-        when "Start"
           updateState _shipId + "/energy", 500
           updateState _shipId + "/energyMax", 1000
           updateState _shipId + "/boosting", false
@@ -89,26 +34,26 @@ define ["r7/evt", "r7/Position"], (evt, Position) ->
         when "ReqEvt"
           onReqEvent e.e
         when "BeginContact"
-          
+
           #console.debug('contact', e);
           if e.objId0.indexOf("area/") is 0
             if e.objId1.indexOf("ship/") is 0
 
-            
+
             # crash if no shield
             else e.objId1.indexOf("ship/1-b") is 0
-        
+
         # despawn bullet
-        
+
         #if (e.objId0 === 'ship/1' && e.objId1 === 'target-g1/1') {
         #TODO move some game rule from targetG1 here ?
         #out.push(incState('ship-1.score', 1));
         #}
         when "Tick"
-          
+
           #console.debug("t", _lastSeconde, delta);
           updateEnergy(e.delta500)  if _states.running and e.delta500 >= 1
-        
+
         # if boost decrease energy
         # if shield decrease energy
         # else increase energy
@@ -116,7 +61,7 @@ define ["r7/evt", "r7/Position"], (evt, Position) ->
         when "Stop"
           updateState "running", false
         else
-      
+
       # pass
       evt.moveInto _pending, out
 
@@ -124,7 +69,7 @@ define ["r7/evt", "r7/Position"], (evt, Position) ->
       switch e.k
         when "UpdateVal"
           updateState e.key, e.value
-        
+
         #ignore
         when "IncVal"
           incState e.key, e.inc  if e.key.indexOf(_shipId) is 0
@@ -164,7 +109,7 @@ define ["r7/evt", "r7/Position"], (evt, Position) ->
       v = _states[k]
       unit = 0
       unit -= 5  if _states[_shipId + "/boosting"]
-      
+
       #if (_states[_shipId + '/shooting']) unit -= 7;
       unit -= 10  if _states[_shipId + "/shielding"]
       unit += 3  if unit is 0
