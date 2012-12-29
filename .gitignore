@@ -5,3 +5,4 @@ build.jar
 src/main/3d/*.blend1
 src/main/3d/*.blend2
 docs/refs
+.idea
