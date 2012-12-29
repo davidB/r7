@@ -1,5 +1,5 @@
 define ["r7/evt"], (evt) ->
-  
+
   ###
   @param {Element} container
   ###
@@ -8,7 +8,7 @@ define ["r7/evt"], (evt) ->
     _container = container
     _shipId = null
     _pending = []
-    
+
     # use http://www.quirksmode.org/js/keys.html to test
     _keysNone = []
     _keysUser = [
@@ -50,7 +50,7 @@ define ["r7/evt"], (evt) ->
         when "SpawnShip"
           bindShipControl e.objId  if e.isLocal
         else
-      
+
       # pass
       evt.moveInto _pending, out
 
@@ -70,7 +70,7 @@ define ["r7/evt"], (evt) ->
 
     bindShipControl = (shipId) ->
       _shipId = shipId
-      
+
       #container.onkeypress= this.onKeyDown;
       #container.onkeyup = this.onKeyUp;
       #Lib.document.onkeypress = onKeyDown;

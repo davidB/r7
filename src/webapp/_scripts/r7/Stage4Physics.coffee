@@ -1,5 +1,5 @@
 define ["r7/evt", "console", "Box2D", "r7/Vec3F", "r7/Position", "underscore"], (evt, console, Box2D, Vec3F, Position, _) ->
-  
+
   # shortcut, alias
   B2World = Box2D.Dynamics.b2World
   B2FixtureDef = Box2D.Dynamics.b2FixtureDef
@@ -16,12 +16,12 @@ define ["r7/evt", "console", "Box2D", "r7/Vec3F", "r7/Position", "underscore"], 
   _scale = 30
   _adaptative = false
   _intervalRate = 60
-  
+
   #Box2D reuse fixture,...
   _fixDef = new B2FixtureDef()
   _bodyDef = new B2BodyDef()
   _id2body = {}
-  
+
   ###
   @constructor
   @param {Id} id
@@ -45,12 +45,12 @@ define ["r7/evt", "console", "Box2D", "r7/Vec3F", "r7/Position", "underscore"], 
         when "SpawnArea"
           spawnArea e.objId, e.scene3d  unless not e.scene3d
         when "SpawnShip"
-          
+
           #trace("create ship in box2d")
           spawnShip e.objId, e.pos  unless not e.obj3d
-        
+
         #var debugDraw = new Box2D.Dynamics.b2DebugDraw;
-        #debugDraw.SetSprite(document.getElementsByTagName("canvas")[0].getContext("2d")); 
+        #debugDraw.SetSprite(document.getElementsByTagName("canvas")[0].getContext("2d"));
         when "BoostShipStart"
           setBoost e.objId, 0.3
         when "BoostShipStop"
@@ -73,13 +73,13 @@ define ["r7/evt", "console", "Box2D", "r7/Vec3F", "r7/Position", "underscore"], 
         when "Tick"
           update e.t
           pushStates out
-          
+
           #          if (out.length > 0) {
           out.push evt.Render
-        
+
         #          }
         else
-      
+
       #pass
       evt.moveInto _pending, out
 
@@ -138,14 +138,14 @@ define ["r7/evt", "console", "Box2D", "r7/Vec3F", "r7/Position", "underscore"], 
           a = b.GetAngle()
           force = ud.boost #0.3;//(0.1 * dt);
           acc = Vec3F(Math.cos(a) * force, Math.sin(a) * force, 0)
-          
+
           #Speed or Acceleration ?
           out.push evt.MoveObjTo(ud.id, Position(p.x * _scale, p.y * _scale, a), acc)
         b = b.m_next
 
     updateForce = (ud, b, dt) ->
       if ud.boost isnt 0
-        
+
         #b.wakeUp();
         # if (myBody->IsAwake() == true)
         a = b.GetAngle()
@@ -157,29 +157,29 @@ define ["r7/evt", "console", "Box2D", "r7/Vec3F", "r7/Position", "underscore"], 
       else #if stabilistor
 
     #b.setLinearVelocity(new B2Vec2(0.0, 0.0));
-    
+
     ###
     @param {Id} id
     @param {function(B2Body, UserData)} f
     ###
     forBody = (id, f) ->
       back = null
-      
+
       #
       #      var b = _world.GetBodyList();
       #      var done = false;
       #      while(b !== null && !done) {
-      #      
+      #
       b = _id2body[id]
       if b isnt null and typeof b isnt "undefined"
         ud = b.GetUserData()
-        
+
         #trace(ud);
         #trace(id);
         #        if (!!ud && ud.id == id) { //TODO check if active ?
         #          done = true;
         back = f(b, ud)
-      
+
       #        } else {
       #          b = b.m_next;
       #        }
@@ -198,7 +198,7 @@ define ["r7/evt", "console", "Box2D", "r7/Vec3F", "r7/Position", "underscore"], 
     setAngle = (shipId, a) ->
       forBody shipId, (b, ud) ->
         b.SetAwake true
-        
+
         # should take care of dampling (=> * 3)
         b.SetAngularVelocity 0 # 180 * rot * _degToRad * 3); //90 deg per second
         b.SetAngle a #TODO rotate until raise the target angle instead of switch
@@ -207,23 +207,23 @@ define ["r7/evt", "console", "Box2D", "r7/Vec3F", "r7/Position", "underscore"], 
     setRotation = (shipId, rot) ->
       forBody shipId, (b, ud) ->
         b.SetAwake true
-        
+
         # should take care of dampling (=> * 3)
         b.SetAngularVelocity 180 * rot * _degToRad * 3 #90 deg per second
 
 
     impulseObj = (objId, a, force) ->
       forBody objId, (b, ud) ->
-        
+
         #console.debug('impulse2', objId, force, a);
         impulse = Vec3F(Math.cos(a) * force, Math.sin(a) * force, 0)
         b.ApplyImpulse impulse, b.GetWorldCenter()
         b.SetAwake true
 
 
-    
+
     #console.debug(GetWorldCenter());
-    
+
     #TODO load from models
     spawnShip = (id, pos) ->
       _bodyDef.type = B2Body.b2_dynamicBody
@@ -236,12 +236,12 @@ define ["r7/evt", "console", "Box2D", "r7/Vec3F", "r7/Position", "underscore"], 
       s = B2PolygonShape.AsVector([new B2Vec2(2 / _scale, 0), new B2Vec2(-1 / _scale, 1 / _scale), new B2Vec2(-1 / _scale, -1 / _scale)], 3)
       _fixDef.shape = s
       _fixDef.density = _scale
-      
+
       #_world.setContactListener(WorldContactListener());
       _fixDef.isSensor = false
       createBody(id, _bodyDef).CreateFixture _fixDef
 
-    
+
     #TODO load from models
     spawnArea = (id, scene3d) ->
       _bodyDef.type = B2Body.b2_staticBody
@@ -254,34 +254,34 @@ define ["r7/evt", "console", "Box2D", "r7/Vec3F", "r7/Position", "underscore"], 
       return  unless obj3d
       faces = obj3d.geometry.faces
       vertices = obj3d.geometry.vertices
-      
+
       #TODO should apply obj.matrixWorld to vertices
       scalex = obj3d.scale.x
       scaley = obj3d.scale.y
-      
+
       #obj3d.materials.push(new THREE.MeshBasicMaterial( { color: 0x000000, shading: THREE.FlatShading, wireframe: true, transparent: true } ));
       #var markColor = obj3d.materials.length -1 ;
       faces.forEach (face) ->
         edges = _.reduce([face.a, face.b, face.c, face.d], (acc, v) ->
-          
+
           #Face3 doesn't have face.d
           if typeof v isnt "undefined" and v isnt null
             v2 = new B2Vec2((vertices[v].x * scalex + obj3d.position.x) / _scale, (vertices[v].y * scaley + obj3d.position.y) / _scale)
-            
+
             # Guard
             #TODO remove guard an do check in exported (v3 distinct, Face3 store as Face4)
             if acc.length is 0 or ((acc[acc.length - 1].x isnt v2.x or acc[acc.length - 1].y isnt v2.y) and (acc[0].x isnt v2.x or acc[0].y isnt v2.y))
               acc.push v2
             else
               console.warn "duplicate vertices in the Face", face, v, v2, acc[acc.length - 1], acc[0]
-          
+
           #face.vertexColors = new THREE.Color(0xff0000);
           #face.color = new THREE.Color(0xff0000);
           acc
         , [])
         if edges.length > 2
-          
-          # check if direct oriented       
+
+          # check if direct oriented
           #
           #          var accum = 0.0;
           #          for (var i2 = 0; i2 < edges.length; i2++) {
@@ -293,29 +293,29 @@ define ["r7/evt", "console", "Box2D", "r7/Vec3F", "r7/Position", "underscore"], 
           #          face.vertexColors = new THREE.Color(0xff0000);
           #          face.color = new THREE.Color(0xff0000);
           #          }
-          #          
-          
+          #
+
           #console.debug(edges);
           s = B2PolygonShape.AsVector(edges, edges.length)
-          
+
           #var s = new B2EdgeShape(new B2Vec2(p0[0], p0[1]), new B2Vec2(p1[0], p1[1]));
           _fixDef.shape = s
           _fixDef.isSensor = false
           body.CreateFixture _fixDef
         else
-          
+
           # visual effect for the polygone (eg: change color)
           console.warn "edges.length of area < 3", edges, face
 
-      
+
       #face.vertexColors = new THREE.Color(0xff0000);
       #face.color = new THREE.Color(0xff0000);
-      
+
       #  face.materialIndex = markColor;
       #obj3d.geometry.dynamic = true;
       #obj3d.geometry.__dirtyColors = true;
       #obj3d.material.vertexColors = THREE.FaceColors;
-      #        
+      #
       #        // create a set of polygone (4 side but not right angle as a work around for chainEdge support not available in box2D 2.1
       #        // or try b2EdgeShape edgeShape;  edgeShape.Set( b2Vec2(-15,0), b2Vec2(15,0) );
       #        var poly = [];
@@ -323,12 +323,12 @@ define ["r7/evt", "console", "Box2D", "r7/Vec3F", "r7/Position", "underscore"], 
       #        // if closed start with the edge point[-1] -> point[0]
       #        var startIndex = (points.length > 2 && fragment.closed) ? 0 : 1;
       #        for(var i = startIndex; i < points.length; i++) {
-      #          
+      #
       #          var p0 = points[((i < 1)? points.length + i : i) - 1];
       #          var p1 = points[i];
       #          console.log(p0);
       #          console.log(p1);
-      #          
+      #
       #          var dx = fragment.radius * ((p0[0] <= p1[0])? -1 : 1);
       #          var dy = fragment.radius * ((p0[1] <= p1[1])? -1 : 1);
       #          var edges = [
@@ -347,7 +347,7 @@ define ["r7/evt", "console", "Box2D", "r7/Vec3F", "r7/Position", "underscore"], 
       #          }
       #          console.log(edges);
       #          var s = B2PolygonShape.AsVector(edges, 4);
-      #          
+      #
       #          //var s = new B2EdgeShape(new B2Vec2(p0[0], p0[1]), new B2Vec2(p1[0], p1[1]));
       #          _fixDef.shape = s;
       #          body.CreateFixture(_fixDef);
@@ -358,9 +358,9 @@ define ["r7/evt", "console", "Box2D", "r7/Vec3F", "r7/Position", "underscore"], 
     findAvailablePos = (newPos) ->
       pos = null
       if typeof newPos is "function"
-        
+
         #TODO avoid infinite loop
-        #        for(pos = newPos() ; isAvailable(pos) ; pos = newPos());       
+        #        for(pos = newPos() ; isAvailable(pos) ; pos = newPos());
         pos = Position(0, 0, 0)
       else pos = newPos  if isAvailable(newPos)
       throw "Can't find available pos : " + newPos  if pos is null
@@ -378,17 +378,17 @@ define ["r7/evt", "console", "Box2D", "r7/Vec3F", "r7/Position", "underscore"], 
       _bodyDef.position.y = pos.y / _scale
       _bodyDef.angle = pos.a
       _bodyDef.fixedRotation = true
-      
+
       #_bodyDef.linearDamping = 1.0;
       #_bodyDef.angularDamping = 0.31;
       _bodyDef.userData = UserData(id, 0)
       s = new B2CircleShape(1 / _scale)
       _fixDef.shape = s
       _fixDef.density = _scale
-      
-      #_fixDef.isSensor = true; 
+
+      #_fixDef.isSensor = true;
       #console.debug("target", _fixDef);
-      
+
       #return _world.CreateBody(_bodyDef).CreateFixture(_fixDef);
       createBody(id, _bodyDef).CreateFixture _fixDef
 
@@ -399,13 +399,13 @@ define ["r7/evt", "console", "Box2D", "r7/Vec3F", "r7/Position", "underscore"], 
         _bodyDef.position.x = b.GetPosition().x
         _bodyDef.position.y = b.GetPosition().y
         _bodyDef.angle = b.GetAngle()
-        
+
         #        _bodyDef.linearDamping = 0.0;
         #        _bodyDef.angularDamping = 0.0;
         #        _bodyDef.isSensor = false;
         _bodyDef.bullet = true
         _bodyDef.userData = UserData(id, 0)
-        
+
         #        _bodyDef.position.x += 5;
         #_bodyDef.linearVelocity.x = 20 * Math.cos(a);
         #_bodyDef.linearVelocity.y = 20 * Math.sin(a);
@@ -441,31 +441,31 @@ define ["r7/evt", "console", "Box2D", "r7/Vec3F", "r7/Position", "underscore"], 
 
 #
 #                                    void BeginContact(b2Contact* contact) {
-#                                        
+#
 #                                            //check if fixture A was a ball
 #                                            void* bodyUserData = contact->GetFixtureA()->GetBody()->GetUserData();
 #                                                  if ( bodyUserData )
 #                                                            static_cast<Ball*>( bodyUserData )->startContact();
-#                                                    
+#
 #                                                        //check if fixture B was a ball
 #                                                        bodyUserData = contact->GetFixtureB()->GetBody()->GetUserData();
 #                                                              if ( bodyUserData )
 #                                                                        static_cast<Ball*>( bodyUserData )->startContact();
-#                                                                
+#
 #                                                                  }
-#                                      
+#
 #                                        void EndContact(b2Contact* contact) {
-#                                            
+#
 #                                                //check if fixture A was a ball
 #                                                void* bodyUserData = contact->GetFixtureA()->GetBody()->GetUserData();
 #                                                      if ( bodyUserData )
 #                                                                static_cast<Ball*>( bodyUserData )->endContact();
-#                                                        
+#
 #                                                            //check if fixture B was a ball
 #                                                            bodyUserData = contact->GetFixtureB()->GetBody()->GetUserData();
 #                                                                  if ( bodyUserData )
 #                                                                            static_cast<Ball*>( bodyUserData )->endContact();
-#                                                                    
+#
 #                                                                      }
 #                                          };
 #}

@@ -1,6 +1,6 @@
 define(
-  ['THREE', 'console', 'r7/evt', 'r7/models', 'webglDetector', 'underscore', 'r7/cameraMode2D'],
-  (THREE, console, evt, models, webglDetector, _, cameraConstraint) ->
+  ['THREE', 'console', 'r7/evt', 'webglDetector', 'underscore', 'r7/cameraMode2D'],
+  (THREE, console, evt, webglDetector, _, cameraConstraint) ->
     (container, context) ->
 
       _scene = new THREE.Scene()

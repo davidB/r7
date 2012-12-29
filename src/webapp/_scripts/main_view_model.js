@@ -1,12 +1,3 @@
-define('console', [], function() {
-  if (!console.exception) {
-    console.exception = function(exc){
-      console.error(exc.message, exc.stack);
-    }
-  }
-  return console;
-});
-
 define('r7/timer', [], function(){
   return {
     t: function(){
