@@ -66,10 +66,10 @@ define ["r7/evt", "console", "Box2D", "r7/Vec3F", "r7/Position", "underscore"], 
           out.push spawnBullet(e.emitterId)
         when "ImpulseObj"
           impulseObj e.objId, e.angle, e.force
-        when "SpawnTargetG1"
-          spawnTargetG1 e.objId, e.pos
+        when "SpawnObj"
+          spawnObj(e.objId, e.pos)
         when "DespawnObj"
-          despawn e.objId
+          despawn(e.objId)
         when "Tick"
           update e.t
           pushStates out
@@ -114,7 +114,11 @@ define ["r7/evt", "console", "Box2D", "r7/Vec3F", "r7/Position", "underscore"], 
 
     despawn = (id) ->
       forBody id, (b, u) ->
-        _world.DestroyBody b
+        console.log("!!!! DESPAWN ", id, _id2body, b)
+        _world.DestroyBody(b)
+        delete _id2body[id]
+        delete _world[id]
+        #_id2body[id] = null
 
 
     update = (t) ->
@@ -371,7 +375,7 @@ define ["r7/evt", "console", "Box2D", "r7/Vec3F", "r7/Position", "underscore"], 
       _id2body[id] = b
       b
 
-    spawnTargetG1 = (id, newPos) ->
+    spawnObj = (id, newPos) ->
       pos = findAvailablePos(newPos)
       _bodyDef.type = B2Body.b2_dynamicBody
       _bodyDef.position.x = pos.x / _scale
