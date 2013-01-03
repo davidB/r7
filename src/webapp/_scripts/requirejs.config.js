@@ -18,6 +18,7 @@ require.config({
     'dat' : '../_vendors/dat-gui-20111206/dat.gui.min',
     'ko' : '../_vendors/knockout-2.2.0',
     'Box2D' : '../_vendors/box2dweb-2.1alpha/Box2D.min',
+    'chipmunk' : '../_vendors/chipmunk/cp',
     'd3' : '../_vendors/d3.v2.min',
     'jquery' : [
       'http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min',
@@ -29,6 +30,7 @@ require.config({
       'http://code.createjs.com/preloadjs-0.2.0.min',
       '../_vendors/preloadjs-0.2.0/preloadjs-0.2.0.min'
     ],
+    'Q' : '../_vendors/q-0.8.11/q.min'
     // polyfil
     'webglDetector' : '../_vendors/three-r53/Detector',
     'console' : '../_vendors/console_log',
@@ -50,7 +52,9 @@ require.config({
     'Stats' :         { deps: [], exports: 'Stats' },
     'd3' :            { deps: [], exports: 'd3' },
     'Box2D' :         { deps: [], exports: 'Box2D' },
+    'chipmunk' :      { deps: [], exports: 'cp' },
     'preloadjs':      { deps: [], exports: 'createjs.PreloadJS'},
+    'Q':              { deps: [], exports: 'Q'},
     'jasmine' :       { deps: [], exports: 'jasmine'},
     'jasmine-html' :  { deps: ['jasmine'], exports: 'jasmine.TrivialReporter'}
   },
