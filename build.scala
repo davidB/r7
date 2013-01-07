@@ -1,12 +1,15 @@
 #!/bin/sh
 SCRIPT="$(cd "${0%/*}" 2>/dev/null; echo "$PWD"/"${0##*/}")"
 DIR=`dirname "${SCRIPT}"}`
-exec scala -save -nc -cp "$DIR/tools/lib/plob-0.2.0-SNAPSHOT.jar:$DIR/tools/lib/compiler.jar" $0 $*
+exec scala -save -nc -cp "$DIR/tools/lib/plob-0.2.0-SNAPSHOT.jar:$DIR/tools/lib/compiler.jar:$DIR/tools/lib/livereload-jvm-0.2.0-SNAPSHOT-onejar.jar" $0 $*
 ::!#
 
 import plob.AnnotedPathGenerator
 import plob._
 import plob.builders._
+
+import java.nio.file.FileSystems
+import java.nio.file.Path
 
 object Main {
   def main(args : Array[String]) {
@@ -30,6 +33,10 @@ object Main {
       , "--externs", "src/js_externs/require.js"
       , "--externs", "src/js_externs/jasmine.js"
     ))
+
+    val webappS : Path = "src/webapp"
+    val webappT : Path = "target/webapp"
+
     var build = builders.pipe(
       builders.route(
         ("glob:src/webapp/_scripts/**.coffee", builders.pipe(
@@ -38,25 +45,32 @@ object Main {
         ))
 //        ("glob:src/webapp/_scripts/**.js", closureCompiler)
 //        , ("glob:target/gen_js/**.js", closureCompiler)
-        , ("glob:src/webapp/**.jade", b.Compiler_Jade("src/webapp", "target/webapp"))
-        , ("glob:src/webapp/**", b.Misc_Sync("src/webapp", "target/webapp"))
+        , ("glob:src/webapp/**.jade", b.Compiler_Jade(webappS, webappT))
+        , ("glob:src/webapp/**", b.Misc_Sync(webappS, webappT))
       ),
       builders.route(
         ("glob:src/test/vows/**.js", b.Checker_Vows("."))
       )
-        //, JadeCompiler("src/jade", "glob:**/*.jade", "target/webapp"),
-        //, CoffeeScriptCompiler2("src/test/coffee", "glob:**/*.coffee", "target/webapp"),
+        //, JadeCompiler("src/jade", "glob:**/*.jade", webappT),
+        //, CoffeeScriptCompiler2("src/test/coffee", "glob:**/*.coffee", webappT),
         //, VowsRunner("src/test/coffee", "glob:**/*.js")
     )
-// node r.js src/test/vows/modules.test.js 
+// node r.js src/test/vows/modules.test.js
 // vows src/test/vows/modules.test.js --json
     val input = new AnnotedPathGenerator("src")
     for(arg <- args) arg match {
       case "all" => input.runAllOnce(build, basicResultsConsolePrinter )
       case "watch" => input.watch(build, basicResultsConsolePrinter)
       case "setup" => b.Checker_Vows.setup()
+      case "http-start" => httpStart(webappT)
       case x => println("unsupported argument '%s'".format(x))
     }
     println("DONE")
+  }
+
+  def httpStart(docroot : Path) = {
+    //#repo central m2:http://repo1.maven.org/maven2/
+    import net_alchim31_livereload.LRServer //#from net.alchim31:livereload-jvm:0.2.0
+    new LRServer(35729, docroot).start()
   }
 }
