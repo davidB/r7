@@ -65,17 +65,17 @@ define(
         switch e.k
 
           #TODO initialize/reset
-          when "Init", "Start"
+          when "Start"
             out.push(start())
           when "Render"
             render()
           when "SpawnArea"
-            spawnScene(e.objId, e.pos, e.scene3d)  if e.scene3d?
+            spawnScene(e.objId, e.pos, e.scene3d)
           when "SpawnShip"
             _cameraTargetObjId = e.objId  if e.isLocal
-            spawnObj(e.objId, e.pos, e.obj3d) if e.obj3d?
-          when "SpawnTargetG1", "SpawnObj"
-            spawnObj(e.objId, e.pos, e.obj3d) if e.obj3d?
+            spawnObj(e.objId, e.pos, e.obj3d)
+          when "SpawnObj"
+            spawnObj(e.objId, e.pos(), e.obj3d)
           when "MoveObjTo"
             moveObjTo(e.objId, e.pos)
           when "SpawnCube"

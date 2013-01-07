@@ -6,18 +6,18 @@ define ["r7/evt", "r7/Position", "r7/Rules4TargetG1"], (evt, Position, Rules4Tar
       out = []
       sut evt.Tick(0), out
       sut evt.Tick(33), out
-      r = evt.extractK(out, "SpawnTargetG1")
+      r = evt.extractK(out, "SpawnObj")
       expect(r.length).toEqual 0
       sut evt.SpawnShip(shipId, null, Position(3, 5, 0), null, true), out
       console.log out
-      r = evt.extractK(out, "SpawnTargetG1")
+      r = evt.extractK(out, "SpawnObj")
       console.log r
       expect(r.length).toEqual 1
       i = 0
 
       while i < 3
         sut evt.SpawnShip(shipId, null, Position(3 + 1, 5 - i, 0), null, true), out
-        r = evt.extractK(out, "SpawnTargetG1")
+        r = evt.extractK(out, "SpawnObj")
         expect(r.length).toEqual 1
         i++
 
@@ -30,7 +30,7 @@ define ["r7/evt", "r7/Position", "r7/Rules4TargetG1"], (evt, Position, Rules4Tar
         sut = Rules4TargetG1()
         sut.onEvent evt.Tick(0), out
         sut.onEvent evt.SpawnShip(shipId, null, Position(3, 5, 0), null, true), out
-        r = evt.extractK(out, "SpawnTargetG1")
+        r = evt.extractK(out, "SpawnObj")
         expect(r.length).toEqual 1
         tid = r[0].objId
         out.length = 0
@@ -39,7 +39,7 @@ define ["r7/evt", "r7/Position", "r7/Rules4TargetG1"], (evt, Position, Rules4Tar
       it "should despawn/spawn", ->
         r = evt.extractK(out, "DespawnObj", tid)
         expect(r.length).toEqual 1
-        r = evt.extractK(out, "SpawnTargetG1", tid)
+        r = evt.extractK(out, "SpawnObj", tid)
         expect(r.length).toEqual 1
 
       it "should increase score", ->
@@ -78,7 +78,7 @@ define ["r7/evt", "r7/Position", "r7/Rules4TargetG1"], (evt, Position, Rules4Tar
         sut = Rules4TargetG1()
         sut.onEvent evt.Tick(0), out
         sut.onEvent evt.SpawnShip(shipId, null, Position(3, 5, 0), null, true), out
-        r = evt.extractK(out, "SpawnTargetG1")
+        r = evt.extractK(out, "SpawnObj")
         expect(r.length).toEqual 1
         tid = r[0].objId
         out.length = 0

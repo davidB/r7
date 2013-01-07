@@ -1,4 +1,4 @@
-define ["r7/evt", "r7/Position"], (evt, Position) ->
+define(["r7/evt", "r7/Position", "r7/assetsLoader"], (evt, Position, assetsLoader) ->
 
   ###
   @param {number} min
@@ -24,58 +24,60 @@ define ["r7/evt", "r7/Position"], (evt, Position) ->
 
       #randomFloat(1, 5)/10 //TODO include level in the formula
       a = a0 + (tryCt * Math.PI * 2 / tryLg)
-      Position pos0.x + d0 * Math.cos(a), pos0.y + d0 * Math.sin(a), pos0.a
+      Position(pos0.x + d0 * Math.cos(a), pos0.y + d0 * Math.sin(a), pos0.a)
 
   ->
     self = {}
     _value = 1 #getter for display
     _timeoutAt = -1
-    _targetG1Id = "target-g1/" + (new Date().getTime())
+    _targetG1IdPrefix = "target-g1/"
+    _targetG1Id = _targetG1IdPrefix + (new Date().getTime())
     _lastPos0 = null
+    _pending = []
     self.onEvent = (e, out) ->
       switch e.k
         when "SpawnShip"
-
+          console.log(">>>>>>>>>> Spawn target")
           #        console.log(e, _lastPos0);
           if e.isLocal and _lastPos0 is null
+            console.log(">>>>>>>>>> Spawn target")
             _lastPos0 = e.pos
-            onAutoEvent evt.SpawnTargetG1(_targetG1Id, "targetg101", nextPositionFactory(_lastPos0, _value)), out
-
-        #TODO random position near ship
-        when "SpawnTargetG1"
-          _lastPos0 = e.pos  if e.pos isnt null
-          onAutoEvent evt.StartCountdown(_targetG1Id + "/countdown", 5,
-            k: "TargetG1.Timeout"
-          ), out
+            assetsLoader.find('targetg101').then((x) -> onAutoEvent(evt.SpawnObj(_targetG1Id, nextPositionFactory(_lastPos0, _value), x), _pending)).done()
+          #TODO random position near ship
+        when "SpawnObj"
+          console.log("SpawnObj", e)
+          if e.objId.indexOf(_targetG1IdPrefix) == 0
+            _lastPos0 = e.pos  if e.pos isnt null
+            onAutoEvent(evt.StartCountdown(_targetG1Id + "/countdown", 55, {k: "TargetG1.Timeout"}), out)
         when "TargetG1.Timeout"
-          onTimeout out
+          onTimeout(out)
         when "BeginContact"
-          onHit e.objId0, out  if e.objId0.indexOf("ship/") is 0 and e.objId1.indexOf("target-g1/") is 0
+          onHit(e.objId0, out) if e.objId0.indexOf("ship/") is 0 and e.objId1.indexOf(_targetG1iIdPrefix) is 0
         else
+         #pass
+      evt.moveInto(_pending, out)
 
-
-    #pass
     onAutoEvent = (e, out) ->
       if e isnt null
-        out.push e
-        self.onEvent e, out
+        out.push(e)
+        self.onEvent(e, out)
 
     onHit = (shipId, out) ->
-      onAutoEvent evt.StopCountdown(_targetG1Id + "/countdown"), out
-      onAutoEvent evt.IncVal(shipId + "/score", _value), out
-      onAutoEvent evt.DespawnObj(_targetG1Id), out
+      onAutoEvent(evt.StopCountdown(_targetG1Id + "/countdown"), out)
+      onAutoEvent(evt.IncVal(shipId + "/score", _value), out)
+      onAutoEvent(evt.DespawnObj(_targetG1Id), out)
       _value += 1
-      onAutoEvent evt.UpdateVal(_targetG1Id + "/value", _value), out
-      onAutoEvent evt.SpawnTargetG1(_targetG1Id, "targetg101", nextPositionFactory(_lastPos0, _value)), out
+      onAutoEvent(evt.UpdateVal(_targetG1Id + "/value", _value), out)
+      #onAutoEvent evt.SpawnObj(_targetG1Id, "targetg101", nextPositionFactory(_lastPos0, _value)), out
 
     onTimeout = (out) ->
-      console.log "TIMEOUT"
-      onAutoEvent evt.DespawnObj(_targetG1Id), out
+      console.log("TIMEOUT")
+      onAutoEvent(evt.DespawnObj(_targetG1Id), out)
       _value = Math.max(1, _value - 10)
-      onAutoEvent evt.UpdateVal(_targetG1Id + "/value", _value), out
-      onAutoEvent evt.SpawnTargetG1(_targetG1Id, "targetg101", nextPositionFactory(_lastPos0, _value)), out
+      onAutoEvent(evt.UpdateVal(_targetG1Id + "/value", _value), out)
+      #onAutoEvent evt.SpawnObj(_targetG1Id, "targetg101", nextPositionFactory(_lastPos0, _value)), out
 
     self
 
-
+)
 #TODO time countdown

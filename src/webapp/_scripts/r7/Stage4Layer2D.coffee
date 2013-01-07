@@ -1,4 +1,4 @@
-define(["r7/evt", "domReady", "ko", "module"], (evt, domReady, ko, module) ->
+define(["r7/evt", "ko"], (evt, ko) ->
   ViewModel = () ->
     @score = ko.observable(0)
     @energy = ko.observable(50)
@@ -8,21 +8,6 @@ define(["r7/evt", "domReady", "ko", "module"], (evt, domReady, ko, module) ->
     @shieldActive = ko.observable(false)
     @fireActive = ko.observable(false)
     this
-
-
-  #TODO move xhr methods into a network/resource utils lib
-  xhr = (url, mime, callback) ->
-    req = new XMLHttpRequest
-    req.overrideMimeType(mime) if mime and req.overrideMimeType
-    req.open("GET", url, true)
-    req.setRequestHeader("Accept", mime)  if mime
-    req.onreadystatechange = ->
-      if req.readyState is 4
-        s = req.status
-        callback(if not s and req.response or s >= 200 and s < 300 or s is 304 then req else null)
-
-    req.send(null)
-
 
   ###
   @param {Element} container
@@ -34,23 +19,10 @@ define(["r7/evt", "domReady", "ko", "module"], (evt, domReady, ko, module) ->
     self.onEvent = (e, out) ->
       switch e.k
         when "Init"
-          #d3.xml("/_images/gui.svg", "image/svg+xml", function(xml) {
-          console.log(module, module.config())
-          xhr(module.config().baseUrl + "_images/gui.svg", "image/svg+xml", (req) ->
-            (domReady) ->
-              xml = req and req.responseXML
-              if xml is null
-
-                #TODO log, notify user
-                console.error("failed to load gui.svg")
-                return
-              console.log("LOAD >>>>> SVG")
-              # var importedNode = document.importNode(xml.documentElement, true);
-              # d3.select("#viz").node().appendChild(importedNode);
-              container.appendChild(xml.documentElement)
-              ko.applyBindings(_viewModel)
-          )
-
+          ko.applyBindings(_viewModel, container)
+        when "SpawnHud"
+          container.appendChild(e.domElem) if e.domElem?
+          ko.applyBindings(_viewModel, container)
         when "SpawnShip"
           _shipIdP = e.objId + "/"  if e.isLocal
         when "UpdateVal"
@@ -70,7 +42,7 @@ define(["r7/evt", "domReady", "ko", "module"], (evt, domReady, ko, module) ->
               + (if seconds < 10 then "0" + seconds else seconds)
             )
             _viewModel.countdown(result)
-          else
-            # pass
+        else
+          # pass
     self
 )

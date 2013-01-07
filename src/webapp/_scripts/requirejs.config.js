@@ -30,7 +30,7 @@ require.config({
       'http://code.createjs.com/preloadjs-0.2.0.min',
       '../_vendors/preloadjs-0.2.0/preloadjs-0.2.0.min'
     ],
-    'Q' : '../_vendors/q-0.8.11/q.min'
+    'Q' : '../_vendors/q-0.8.11/q',
     // polyfil
     'webglDetector' : '../_vendors/three-r53/Detector',
     'console' : '../_vendors/console_log',

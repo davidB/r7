@@ -54,32 +54,27 @@ define([], ()->
       k: "StopCountdown"
       key: key
     }
-    Preload : (assets, startOnComplete) -> {
-      k : "Preload"
-      assets: assets
-      startOnComplete : startOnComplete || false
+    SpawnHud: (objId, domElem) -> {
+      k: "SpawnHud"
+      objId: objId
+      domElem : domElem
     }
-    SpawnArea: (objId, modelId, pos, scene3d) -> {
+    DespawnHud: (objId) -> {
+      k: "DespawnHud"
+      objId: objId
+    }
+    SpawnArea: (objId, pos, scene3d) -> {
       k: "SpawnArea"
       objId: objId
-      modelId: modelId
       pos: pos
       scene3d: scene3d
     }
-    SpawnShip: (objId, modelId, pos, obj3d, isLocal) -> {
+    SpawnShip: (objId, pos, obj3d, isLocal) -> {
       k: "SpawnShip"
       objId: objId
-      modelId: modelId
       pos: pos
       obj3d: obj3d
       isLocal: isLocal
-    }
-    SpawnTargetG1: (objId, modelId, pos, obj3d) -> {
-      k: "SpawnTargetG1"
-      objId: objId
-      modelId: modelId
-      pos: pos
-      obj3d: obj3d
     }
     SpawnCube: () -> {
       k: "SpawnCube"
@@ -96,10 +91,9 @@ define([], ()->
       k: "FireBullet"
       emitterId: emitterId
     }
-    SpawnObj: (objId, modelId, pos, obj3d) -> {
+    SpawnObj: (objId, pos, obj3d) -> {
       k: "SpawnObj"
       objId: objId
-      modelId: modelId
       pos: pos
       obj3d: obj3d
     }
@@ -155,7 +149,7 @@ define([], ()->
     }
   }
   evt.moveInto = (src, target) ->
-    if src.length > 0
+    if src.length > 0 && src != target
       target.push.apply(target, src)
       src.length = 0
 
