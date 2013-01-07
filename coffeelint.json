@@ -8,8 +8,8 @@
   },
 
   "max_line_length" : {
-    "value": 120,
-    "level" : "error"
+    "value": 200,
+    "level" : "ignore"
   },
 
   "camel_case_classes" : {
