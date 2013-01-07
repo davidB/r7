@@ -21,6 +21,7 @@ define('main', [
     'r7/Ring',
     'r7/evt',
     'r7/timer',
+    'r7/Stage4LogEvent',
     'ui',
     'rules',
     'console'
@@ -28,6 +29,7 @@ define('main', [
   Ring,
   evt,
   timer,
+  Stage4LogEvent,
   ui,
   rules,
   console
@@ -36,6 +38,7 @@ define('main', [
   return function(){
     var container = window.document.getElementById('layers');
     var ring = Ring([
+      Stage4LogEvent(['Init', 'SpawnObj']).onEvent,
       ui(container).onEvent,
       rules.onEvent
     ]);
