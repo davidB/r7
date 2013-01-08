@@ -58,9 +58,10 @@ define(
       #var pointLight = new THREE.PointLight( 0xffffff, 5, 30 );
       #pointLight.position.set( 5, 0, 0 );
       #_scene.add( pointLight );
-      console.log("renderer", _renderer)
-      console.log("camera", _camera)
-      console.log("scene", _scene)
+      #
+      #console.debug("renderer", _renderer)
+      #console.debug("camera", _camera)
+      #console.debug("scene", _scene)
       self.onEvent = (e, out) ->
         switch e.k
 

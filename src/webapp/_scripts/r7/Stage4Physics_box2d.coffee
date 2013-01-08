@@ -114,7 +114,6 @@ define ["r7/evt", "console", "Box2D", "r7/Vec3F", "r7/Position", "underscore"], 
 
     despawn = (id) ->
       forBody id, (b, u) ->
-        console.log("!!!! DESPAWN ", id, _id2body, b)
         _world.DestroyBody(b)
         delete _id2body[id]
         delete _world[id]
@@ -192,9 +191,7 @@ define ["r7/evt", "console", "Box2D", "r7/Vec3F", "r7/Position", "underscore"], 
       back
 
     setBoost = (shipId, state) ->
-      console.log "setBoost", shipId
       forBody shipId, (b, ud) ->
-        console.debug b, b.GetPosition()
         b.SetAwake true
         ud.boost = (if state then 0.3 else 0.0)
 
@@ -219,14 +216,11 @@ define ["r7/evt", "console", "Box2D", "r7/Vec3F", "r7/Position", "underscore"], 
     impulseObj = (objId, a, force) ->
       forBody objId, (b, ud) ->
 
-        #console.debug('impulse2', objId, force, a);
         impulse = Vec3F(Math.cos(a) * force, Math.sin(a) * force, 0)
         b.ApplyImpulse impulse, b.GetWorldCenter()
         b.SetAwake true
 
 
-
-    #console.debug(GetWorldCenter());
 
     #TODO load from models
     spawnShip = (id, pos) ->
@@ -299,7 +293,6 @@ define ["r7/evt", "console", "Box2D", "r7/Vec3F", "r7/Position", "underscore"], 
           #          }
           #
 
-          #console.debug(edges);
           s = B2PolygonShape.AsVector(edges, edges.length)
 
           #var s = new B2EdgeShape(new B2Vec2(p0[0], p0[1]), new B2Vec2(p1[0], p1[1]));
@@ -330,8 +323,6 @@ define ["r7/evt", "console", "Box2D", "r7/Vec3F", "r7/Position", "underscore"], 
       #
       #          var p0 = points[((i < 1)? points.length + i : i) - 1];
       #          var p1 = points[i];
-      #          console.log(p0);
-      #          console.log(p1);
       #
       #          var dx = fragment.radius * ((p0[0] <= p1[0])? -1 : 1);
       #          var dy = fragment.radius * ((p0[1] <= p1[1])? -1 : 1);
@@ -349,7 +340,6 @@ define ["r7/evt", "console", "Box2D", "r7/Vec3F", "r7/Position", "underscore"], 
       #          if (accum > 0) {
       #            edges.reverse();
       #          }
-      #          console.log(edges);
       #          var s = B2PolygonShape.AsVector(edges, 4);
       #
       #          //var s = new B2EdgeShape(new B2Vec2(p0[0], p0[1]), new B2Vec2(p1[0], p1[1]));
@@ -391,7 +381,6 @@ define ["r7/evt", "console", "Box2D", "r7/Vec3F", "r7/Position", "underscore"], 
       _fixDef.density = _scale
 
       #_fixDef.isSensor = true;
-      #console.debug("target", _fixDef);
 
       #return _world.CreateBody(_bodyDef).CreateFixture(_fixDef);
       createBody(id, _bodyDef).CreateFixture _fixDef

@@ -9,9 +9,7 @@ define ["r7/evt", "r7/Position", "r7/Rules4TargetG1"], (evt, Position, Rules4Tar
       r = evt.extractK(out, "SpawnObj")
       expect(r.length).toEqual 0
       sut evt.SpawnShip(shipId, null, Position(3, 5, 0), null, true), out
-      console.log out
       r = evt.extractK(out, "SpawnObj")
-      console.log r
       expect(r.length).toEqual 1
       i = 0
 

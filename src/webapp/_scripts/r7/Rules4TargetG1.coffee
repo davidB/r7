@@ -37,18 +37,14 @@ define(["r7/evt", "r7/Position", "r7/assetsLoader"], (evt, Position, assetsLoade
     self.onEvent = (e, out) ->
       switch e.k
         when "SpawnShip"
-          console.log(">>>>>>>>>> Spawn target")
-          #        console.log(e, _lastPos0);
           if e.isLocal and _lastPos0 is null
-            console.log(">>>>>>>>>> Spawn target")
             _lastPos0 = e.pos
             assetsLoader.find('targetg101').then((x) -> onAutoEvent(evt.SpawnObj(_targetG1Id, nextPositionFactory(_lastPos0, _value), x), _pending)).done()
           #TODO random position near ship
         when "SpawnObj"
-          console.log("SpawnObj", e)
           if e.objId.indexOf(_targetG1IdPrefix) == 0
             _lastPos0 = e.pos  if e.pos isnt null
-            onAutoEvent(evt.StartCountdown(_targetG1Id + "/countdown", 55, {k: "TargetG1.Timeout"}), out)
+            onAutoEvent(evt.StartCountdown(_targetG1Id + "/countdown", 10, {k: "TargetG1.Timeout"}), out)
         when "TargetG1.Timeout"
           onTimeout(out)
         when "BeginContact"
@@ -71,7 +67,6 @@ define(["r7/evt", "r7/Position", "r7/assetsLoader"], (evt, Position, assetsLoade
       #onAutoEvent evt.SpawnObj(_targetG1Id, "targetg101", nextPositionFactory(_lastPos0, _value)), out
 
     onTimeout = (out) ->
-      console.log("TIMEOUT")
       onAutoEvent(evt.DespawnObj(_targetG1Id), out)
       _value = Math.max(1, _value - 10)
       onAutoEvent(evt.UpdateVal(_targetG1Id + "/value", _value), out)

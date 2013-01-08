@@ -24,7 +24,6 @@ define(["r7/evt"], (evt) ->
           _tasks[e.key] = e
           _states.update(out, e.key, e.timeout, onUpdateState)
         when "Tick"
-          #console.debug("t", _lastSeconde, delta);
           decCountdown(out, e.delta500 / 2)  if e.delta500 > 0
         else
           # pass

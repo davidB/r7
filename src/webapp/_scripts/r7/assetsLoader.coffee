@@ -29,12 +29,10 @@ define(["console", "THREE", "underscore", 'preloadjs', 'Q'], (console, THREE, _,
     obj3d
 
   makeHud = (d) ->
-    console.log("loadHud", d)
     window.document.importNode(d.result.documentElement, true)
 
 
   makeScene = (d) ->
-    console.log("loadScene", d)
     deferred = Q.defer()
     try
       new THREE.SceneLoader().parse(JSON.parse(d.result), (result) ->

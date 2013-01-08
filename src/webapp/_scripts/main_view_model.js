@@ -24,7 +24,6 @@ define('main', [
 
   return function(){
     var container = window.document.getElementById('layers');
-    console.log(">>>>>>>>>>>>>>>>>> main");
     var ring = Ring([
       ui(container).onEvent,
       rules.onEvent

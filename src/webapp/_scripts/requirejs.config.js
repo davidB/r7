@@ -6,7 +6,6 @@ for (var i = l.length-1; i > -1; i--) {
   var p = v.indexOf('requirejs.config.js');
   if (p > -1) baseUrl = v.substring(0, p);
 }
-console.log('baseUrl', baseUrl);
 require.config({
   baseUrl: baseUrl,
   //enforceDefine: true,

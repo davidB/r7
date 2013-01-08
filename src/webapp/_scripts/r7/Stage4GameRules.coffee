@@ -21,11 +21,9 @@ define(["r7/evt", "r7/Position", "r7/assetsLoader", "underscore", "Q"], (evt, Po
             ],
             (x) -> assetsLoader.preload(x.id, x.kind)
           )
-          console.log("assets", assets)
           Q.all(assets).then((x) ->
             _pending.push(evt.Start)
             start()
-            console.log("ALL ASSETS LOADED", _pending)
           )
         when "Start"
           start()
@@ -33,7 +31,6 @@ define(["r7/evt", "r7/Position", "r7/assetsLoader", "underscore", "Q"], (evt, Po
           onReqEvent(e.e)
         when "BeginContact"
 
-          #console.debug('contact', e);
           if e.objId0.indexOf("area/") is 0
             if e.objId1.indexOf("ship/") is 0
 
@@ -49,7 +46,6 @@ define(["r7/evt", "r7/Position", "r7/assetsLoader", "underscore", "Q"], (evt, Po
         #}
         when "Tick"
 
-          #console.debug("t", _lastSeconde, delta);
           updateEnergy(e.delta500)  if _states.running and e.delta500 >= 1
 
         # if boost decrease energy
@@ -64,10 +60,8 @@ define(["r7/evt", "r7/Position", "r7/assetsLoader", "underscore", "Q"], (evt, Po
       evt.moveInto(_pending, out)
 
     start = () ->
-      console.log("START")
       _shipId = "ship/" + (_uid + 1)
       _pending.push(evt.SpawnCube())
-      console.log(assetsLoader.find('gui'))
       assetsLoader.find('gui'   ).then((x) -> _pending.push(evt.SpawnHud('hud', x))).done()
       assetsLoader.find('area01').then((x) -> _pending.push(evt.SpawnArea("area/" + _uid, Position(0.0, 0.0, 0.0), x))).done()
       assetsLoader.find('ship01').then((x) -> _pending.push(evt.SpawnShip(_shipId, Position(0.0, 0.0, 0.5), x, true))).done()

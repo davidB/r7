@@ -23,7 +23,6 @@ define(["r7/evt"], (evt) ->
       _tasks.push(e)
 
     unregisterPeriodic = (id) ->
-      #console.debug("unregister", id);
       _tasks = _tasks.filter((v) -> v.id isnt id)
 
 

@@ -30,8 +30,6 @@ define(["r7/evt", "ko"], (evt, ko) ->
             fieldName = e.key.substring(_shipIdP.length)
             field = _viewModel[fieldName]
             field(e.value) if field?
-
-          #console.debug('update', fieldName, field());
           else if e.key is "countdown"
             totalSec = Math.floor(e.value)
             minutes = parseInt(totalSec / 60, 10)
