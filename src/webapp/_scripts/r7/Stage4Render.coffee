@@ -59,9 +59,6 @@ define(
       #pointLight.position.set( 5, 0, 0 );
       #_scene.add( pointLight );
       #
-      #console.debug("renderer", _renderer)
-      #console.debug("camera", _camera)
-      #console.debug("scene", _scene)
       self.onEvent = (e, out) ->
         switch e.k
 
@@ -81,10 +78,10 @@ define(
             moveObjTo(e.objId, e.pos)
           when "SpawnCube"
             spawnCube()
+          when "DespawnObj"
+            despawnObj(e.objId)
           else
-
-
-      # pass
+            # pass
       start = ->
         spawnAxis()
         evt.SetupDatGui((gui) ->
@@ -157,6 +154,7 @@ define(
         axis.scale.set(0.1, 0.1, 0.1) # default length of axis is 100
         _scene.add(axis)
 
+      #TODO support spawn animation
       spawnObj = (id, pos, obj3d) ->
         obj = _scene.getChildByName(id, false)
         if obj?
@@ -164,18 +162,23 @@ define(
 
           #console.trace();
           return
-        console.debug("create in renderer", id, pos, obj3d)
-        obj3d.name = id
-        obj3d.position.x = pos.x
-        obj3d.position.y = pos.y
-        obj3d.position.z = 0.0
-        obj3d.rotation.z = pos.a
-        obj3d.castShadow = true
-        obj3d.receiveShadow = true
+        obj = obj3d #TODO obj3d.clone ?
+        obj.name = id
+        obj.position.x = pos.x
+        obj.position.y = pos.y
+        obj.position.z = 0.0
+        obj.rotation.z = pos.a
+        obj.castShadow = true
+        obj.receiveShadow = true
 
         #var s = w/75;
         #mesh.scale.set(s, s, s);
-        _scene.add(obj3d)
+        _scene.add(obj)
+
+      #TODO support despawn animation
+      despawnObj = (id) ->
+        obj = _scene.getChildByName(id, false)
+        _scene.remove(obj) if obj?
 
       spawnScene = (id, pos, scene3d) ->
 
