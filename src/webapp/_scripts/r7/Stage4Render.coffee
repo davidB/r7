@@ -6,32 +6,17 @@ define(
       _scene = new THREE.Scene()
       _areaBox = null
       _cube = null
-      w = container.clientWidth
-      h = container.clientHeight
       _cameraTargetObjId = null
-      #             VIEW_ANGLE
-      #             ASPECT
-      #             NEAR,
-      _camera = new THREE.PerspectiveCamera(75, w / h, 1, 1000) #FAR
+      _camera = new THREE.PerspectiveCamera(75, 1, 1, 1000)
 
       #HACK to clean
       #see http://help.dottoro.com/ljorlllt.php
-      #window.document.onresize= function(){ console.log("resize"); _camera.aspect = container.clientWidth / container.clientHeight;};
       _camera.position.z = 100
       _scene.add(_camera)
 
-      #_cameraControls = new THREE.DragPanControls(_camera);
-      #	function onWindowResize( event ) {
-      #
-      #renderer.setSize( window.innerWidth, window.innerHeight );
-      #
-      #camera.aspect = window.innerWidth / window.innerHeight;
-      #camera.updateProjectionMatrix();
-      #
-      #}
-      #
-      _renderer = null
-      if webglDetector.webgl
+      #_cameraControls = new THREE.DragPanControls(_camera)
+
+      _renderer = if webglDetector.webgl
         _renderer = new THREE.WebGLRenderer({
           antialias: true
           preserveDrawingBuffer: true # to allow screenshot
@@ -43,10 +28,21 @@ define(
 
         #TODO display message if Webgl required
         _renderer = new THREE.CanvasRenderer()
-      _renderer.setSize(w, h)
+
       _renderer.setClearColorHex(0xEEEEEE, 1.0)
       _renderer.clear()
+
+      updateViewportSize = (event) ->
+        w = container.clientWidth #window.innerWidth
+        h = container.clientHeight #window.innerHeight
+        _renderer.setSize(w, h)
+        _camera.aspect = w /  h
+        _camera.updateProjectionMatrix()
+        #_camerControls.handleResize()
+
+      updateViewportSize()
       container.appendChild(_renderer.domElement)
+      window.addEventListener( 'resize', updateViewportSize, false )
 
       # Lights
       #_scene.add( new THREE.AmbientLight( 0xFFFFFF ) );
@@ -77,7 +73,7 @@ define(
           when "MoveObjTo"
             moveObjTo(e.objId, e.pos)
           when "SpawnCube"
-            spawnCube()
+            spawnCube(container.clientWidth)
           when "DespawnObj"
             despawnObj(e.objId)
           else
@@ -313,7 +309,7 @@ define(
           obj.position.y = pos.y
           obj.rotation.z = pos.a
 
-      spawnCube = ->
+      spawnCube = (w)->
         _cube = Cube(w / 50)
         _scene.add(_cube)
 
