@@ -12,7 +12,7 @@ require.config({
   paths: {
     'underscore': '../_vendors/underscore-1.4.2/underscore.min',
     'Stats': '../_vendors/stats-r8/Stats',
-    'THREE': '../_vendors/three-r53/three',
+    'THREE': '../_vendors/three-r54/three',
     'ThreeBSP' : '../_vendors/threeCSG-20120615/ThreeCSG',
     'dat' : '../_vendors/dat-gui-20111206/dat.gui.min',
     'ko' : '../_vendors/knockout-2.2.0',
