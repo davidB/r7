@@ -63,17 +63,21 @@ define([], ()->
       k: "DespawnHud"
       objId: objId
     }
-    SpawnArea: (objId, pos, scene3d) -> {
+    SpawnArea: (objId, pos, obj3d, obj2d) -> {
       k: "SpawnArea"
       objId: objId
       pos: pos
-      scene3d: scene3d
+      #scene3d: scene3d
+      obj3d: obj3d
+      obj2d: obj2d
+
     }
-    SpawnShip: (objId, pos, obj3d, isLocal) -> {
+    SpawnShip: (objId, pos, obj3d, obj2d, isLocal) -> {
       k: "SpawnShip"
       objId: objId
       pos: pos
       obj3d: obj3d
+      obj2d: obj2d
       isLocal: isLocal
     }
     SpawnCube: () -> {
@@ -91,11 +95,12 @@ define([], ()->
       k: "FireBullet"
       emitterId: emitterId
     }
-    SpawnObj: (objId, pos, obj3d) -> {
+    SpawnObj: (objId, pos, obj3d, obj2d) -> {
       k: "SpawnObj"
       objId: objId
       pos: pos
       obj3d: obj3d
+      obj2d: obj2d
     }
     DespawnObj: (objId) -> {
       k: "DespawnObj"
@@ -164,6 +169,11 @@ define([], ()->
 
   evt.newStates = () ->
     s = {}
+    smax = {}
+    smin = {}
+    s.setMaxMin = (k, max, min) ->
+      smax[k] = max if max?
+      smin[k] = min if min?
     s.update = (out, k, v, onUpdateState) ->
       if s[k] isnt v
         s[k] = v
@@ -171,7 +181,10 @@ define([], ()->
         onUpdateState(out, k, v)  if onUpdateState?
 
     s.inc = (out, k, i, onUpdateState) ->
-      s.updateState(out, k, s[k] + i, onUpdateState)
+      v = s[k] + i
+      v = Math.min(smax[k], v) if smax[k]?
+      v = Math.max(smin[k], v) if smin[k]?
+      s.updateState(out, k, v, onUpdateState)
 
     s
 

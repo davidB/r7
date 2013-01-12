@@ -64,12 +64,13 @@ define(
           when "Render"
             render()
           when "SpawnArea"
-            spawnScene(e.objId, e.pos, e.scene3d)
+            spawnObj(e.objId, e.pos, e.obj3d)
+            #spawnScene(e.objId, e.pos, e.scene3d)
           when "SpawnShip"
             _cameraTargetObjId = e.objId  if e.isLocal
             spawnObj(e.objId, e.pos, e.obj3d)
           when "SpawnObj"
-            spawnObj(e.objId, e.pos(), e.obj3d)
+            spawnObj(e.objId, e.pos, e.obj3d)
           when "MoveObjTo"
             moveObjTo(e.objId, e.pos)
           when "SpawnCube"
@@ -152,24 +153,37 @@ define(
 
       #TODO support spawn animation
       spawnObj = (id, pos, obj3d) ->
-        obj = _scene.getChildByName(id, false)
+        ids = id.split('>')
+        parent = _scene
+        i = 0
+        while(i< (ids.length - 1))
+          if (parent?)
+            parent = parent.getChildByName(ids[i], false)
+          else
+            console.warn("parent not found", id, ids[i])
+          i++
+        return if ! parent?
+        name = ids[ids.length - 1]
+        obj = parent.getChildByName(name, false)
         if obj?
           console.warn("ignore spawnObj with exiting id", id, obj)
 
-          #console.trace();
+  #console.trace();
           return
-        obj = obj3d #TODO obj3d.clone ?
-        obj.name = id
+        obj = obj3d() #TODO obj3d.clone ?
+        obj.name = name
         obj.position.x = pos.x
         obj.position.y = pos.y
-        obj.position.z = 0.0
+        #obj.position.z = 0.0
         obj.rotation.z = pos.a
         obj.castShadow = true
         obj.receiveShadow = true
 
         #var s = w/75;
         #mesh.scale.set(s, s, s);
-        _scene.add(obj)
+        parent.add(obj)
+        console.debug("spawn", ids, obj, parent)
+
 
       #TODO support despawn animation
       despawnObj = (id) ->

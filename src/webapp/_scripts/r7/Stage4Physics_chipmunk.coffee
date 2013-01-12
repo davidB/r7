@@ -1,4 +1,4 @@
-define(["r7/evt", "console", "chipmunk", "r7/Vec3F", "r7/Position", "underscore"], (evt, console, cp, Vec3F, Position, _) ->
+define(["r7/evt", "console", "chipmunk", "r7/Vec3F", "r7/Position", "underscore", "THREE"], (evt, console, cp, Vec3F, Position, _, THREE) ->
 
   # shortcut, alias
   _degToRad = 0.0174532925199432957
@@ -24,20 +24,20 @@ define(["r7/evt", "console", "chipmunk", "r7/Vec3F", "r7/Position", "underscore"
     _space = null
     _lastTimestamp = 0
     _pending = []
+    _running = false
     self.onEvent = onEvent = (e, out) ->
       switch e.k
         when "Init"
           _space= initSpace()
           _pending = []
+        when "Start"
+          _running = true
+        when "Stop"
+          _running = false
         when "SpawnArea"
-          spawnArea(e.objId, e.scene3d)  unless not e.scene3d
+          spawnArea(e.objId, e.obj2d)
         when "SpawnShip"
-
-          #trace("create ship in box2d")
-          spawnObj(e.objId, "TODO", () -> e.pos) #unless not e.obj3d
-
-        #var debugDraw = new Box2D.Dynamics.b2DebugDraw;
-        #debugDraw.SetSprite(document.getElementsByTagName("canvas")[0].getContext("2d"));
+          spawnObj(e.objId, e.obj2d, e.pos) if e.obj2d?
         when "BoostShipStart"
           setBoost(e.objId, 0.3)
         when "BoostShipStop"
@@ -54,17 +54,14 @@ define(["r7/evt", "console", "chipmunk", "r7/Vec3F", "r7/Position", "underscore"
         when "ImpulseObj"
           impulseObj(e.objId, e.angle, e.force)
         when "SpawnObj"
-          spawnObj(e.objId, "TODO", e.pos)
+          spawnObj(e.objId, e.obj2d, e.pos) if e.obj2d?
         when "DespawnObj"
           despawn(e.objId)
         when "Tick"
-          update(e.t)
-          pushStates(out)
-
-          #          if (out.length > 0) {
-          out.push(evt.Render)
-
-        #          }
+          if _running
+            update(e.t)
+            pushStates(out)
+            out.push(evt.Render) # if out.length > 0
         else
 
       #pass
@@ -103,7 +100,7 @@ define(["r7/evt", "console", "chipmunk", "r7/Vec3F", "r7/Position", "underscore"
 
     despawn = (id) ->
       forBody(id, (b, u) ->
-        _space.removeShape(shape) for shape in b.shapeList
+        _space.removeShape(shape) for shape in b.shapeList when shape?
         _space.removeBody(b)
         delete _id2body[id]
         #_id2body[id] = null
@@ -182,20 +179,51 @@ define(["r7/evt", "console", "chipmunk", "r7/Vec3F", "r7/Position", "underscore"
         b.applyImpulse(impulse, cp.vzero)
       )
 
-    spawnObj = (id, model2d, pos) ->
-      body = new cp.Body(100, Infinity)
-      p = pos()
+    spawnObj = (id, obj2d, pos) ->
+      body = obj2d()
+      p = pos
       body.setPos(cp.v(p.x, p.y)) # = pos
       body.setAngle(p.a)
       body.data = UserData(id, 0) #{ var id = id; var boost = false; };
-      #TODO read model2d
-      shape = new cp.PolyShape(body, [2, 0, -1, -1, -1, 1], cp.vzero)
-      shape.sensor = false
       _space.addBody(body)
-      _space.addShape(shape)
+      _space.addShape(shape) for shape in body.shapes when shape?
       _id2body[id] = body
+      drawBody(body)
+      body
+
+    spawnArea = (id, obj2dF) ->
+      obj2d = obj2dF()
+      obj2d.setPos(cp.v(0, 0))
+      obj2d.setAngle(0)
+      _space.staticBody = obj2d
+      body = _space.staticBody
+      body.data = UserData(id, false) #{ var id = id; var boost = false; };
+      _space.addStaticShape(shape) for shape in body.shapes when shape?
+      _id2body[id] = body
+      drawBody(body)
+      body
+
+    drawBody = (body) ->
+      obj3dF = () ->
+        obj3d = new THREE.Object3D()
+        obj3d.position.z = 0 # for Z != 0 une an ortho camera
+        path = new THREE.Path()
+        verts = body.shapes[0].verts
+        path.moveTo( verts[0], verts[1] )
+        path.lineTo( verts[2], verts[3])
+        path.lineTo( verts[4], verts[5] )
+        path.lineTo( verts[6], verts[7] )
+        geometry = path.toShapes()[0].makeGeometry()
+        #      rectShape.multilineTo( rectLength/2, -rectLength/2 )
+        #rectShape.lineTo( -rectLength/2,      -rectLength/2 )
+        mesh = THREE.SceneUtils.createMultiMaterialObject( geometry, [ new THREE.MeshLambertMaterial( { color: 0xff0000, opacity: 0.2, transparent: true } ), new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true,  opacity: 0.3 } ) ] )
+        obj3d.add(mesh)
+        obj3d
+      #_pending.push(evt.SpawnObj(body.data.id+ '/debug/chipmun/boundingbox', (() -> Position(body.p.x, body.p.y, body.p.a)), obj3d))
+      _pending.push(evt.SpawnObj(body.data.id+ '>debug-physics', Position.zero, obj3dF))
 
     #TODO load from models
+    ###
     spawnArea = (id, scene3d) ->
       body = _space.staticBody
       body.data = UserData(id, false) #{ var id = id; var boost = false; };
@@ -239,6 +267,8 @@ define(["r7/evt", "console", "chipmunk", "r7/Vec3F", "r7/Position", "underscore"
           console.warn("edges.length of area < 3", edges, face)
       )
       body
+    ###
+
     ###
     findAvailablePos = (newPos) ->
       pos = null
