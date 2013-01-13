@@ -2,7 +2,7 @@ target
 node_modules
 *.swp
 build.jar
-src/main/3d/*.blend1
-src/main/3d/*.blend2
+src/3d/*.blend1
+src/3d/*.blend2
 docs/refs
 .idea
