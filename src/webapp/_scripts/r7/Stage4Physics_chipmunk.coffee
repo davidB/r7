@@ -206,18 +206,26 @@ define(["r7/evt", "console", "chipmunk", "r7/Vec3F", "r7/Position", "underscore"
     drawBody = (body) ->
       obj3dF = () ->
         obj3d = new THREE.Object3D()
-        obj3d.position.z = 0 # for Z != 0 une an ortho camera
-        path = new THREE.Path()
-        verts = body.shapes[0].verts
-        path.moveTo( verts[0], verts[1])
-        for i in [2 .. verts.length + 1] by 2
-          i2 = i % verts.length
-          path.lineTo( verts[i2], verts[i2+1])
-        geometry = path.toShapes()[0].makeGeometry()
+        obj3d.position.z = 0.1 #for Z != 0 une an ortho camera
+        for shape2d in body.shapes
+          geometry = switch (typeof shape2d)
+            when cp.PolyShape
+              path = new THREE.Path()
+              verts = shape2d.verts
+              path.moveTo( verts[0], verts[1])
+              for i in [2 .. verts.length + 1] by 2
+                i2 = i % verts.length
+                path.lineTo( verts[i2], verts[i2+1])
+              path.toShapes()[0].makeGeometry()
+            when cp.CircleShape
+              new THREE.CircleGeometry(shape2d.r)
+            else
+              null
         #      rectShape.multilineTo( rectLength/2, -rectLength/2 )
         #rectShape.lineTo( -rectLength/2,      -rectLength/2 )
-        mesh = THREE.SceneUtils.createMultiMaterialObject( geometry, [ new THREE.MeshLambertMaterial( { color: 0xff0000, opacity: 0.2, transparent: true } ), new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true,  opacity: 0.3 } ) ] )
-        obj3d.add(mesh)
+          if geometry?
+            mesh = THREE.SceneUtils.createMultiMaterialObject( geometry, [ new THREE.MeshLambertMaterial( { color: 0xff0000, opacity: 0.2, transparent: true } ), new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true,  opacity: 0.3 } ) ] )
+            obj3d.add(mesh)
         obj3d
       #_pending.push(evt.SpawnObj(body.data.id+ '/debug/chipmun/boundingbox', (() -> Position(body.p.x, body.p.y, body.p.a)), obj3d))
       _pending.push(evt.SpawnObj(body.data.id+ '>debug-physics', Position.zero, obj3dF))

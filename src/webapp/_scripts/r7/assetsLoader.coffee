@@ -86,10 +86,21 @@ define(["console", "THREE", "chipmunk", "underscore", 'preloadjs', 'Q'], (consol
   makeShip = (r) ->
     r.obj2d = () ->
       body = new cp.Body(100, Infinity)
-      shape = new cp.PolyShape(body, [3, 0, -1, -1, -1, 1], cp.vzero)
-      shape.sensor = false
-      body.shapes = [shape]
+      shape = switch r.model
+        when "ship01"
+          s = new cp.PolyShape(body, [3, 0, -1, -1, -1, 1], cp.vzero)
+          s.sensor = false
+          s
+        when "targetg101"
+          s = new cp.CircleShape(body, 1, cp.vzero)
+          s.sensor = true
+          s
+        else
+          console.warn("no rules to create obj2d for", r.model)
+          null
+      body.shapes = [shape] if shape?
       body
+
     r
 
   makeScene = (d) ->
@@ -117,8 +128,10 @@ define(["console", "THREE", "chipmunk", "underscore", 'preloadjs', 'Q'], (consol
         #material = materials[0]
 
         #TODO should create a new object or at least change the timestamp
-        r = {}
-        r.obj3d = () -> fixOrientation(new THREE.Mesh(geometry, new THREE.MeshFaceMaterial(materials)))
+        r = {
+          model : d.id
+          obj3d : () -> fixOrientation(new THREE.Mesh(geometry, new THREE.MeshFaceMaterial(materials)))
+        }
         deferred.resolve(r)
       , texturePath)
     catch exc
