@@ -7,11 +7,12 @@ define(
       _areaBox = null
       _cube = null
       _cameraTargetObjId = null
-      _camera = new THREE.PerspectiveCamera(75, 1, 1, 1000)
+      #_camera = new THREE.PerspectiveCamera(75, 1, 1, 100)
+      _camera = new THREE.OrthographicCamera(10,10,10,10, 1, 100)
 
       #HACK to clean
       #see http://help.dottoro.com/ljorlllt.php
-      _camera.position.z = 100
+      _camera.position.z = 10
       _scene.add(_camera)
 
       #_cameraControls = new THREE.DragPanControls(_camera)
@@ -36,7 +37,12 @@ define(
         w = container.clientWidth #window.innerWidth
         h = container.clientHeight #window.innerHeight
         _renderer.setSize(w, h)
-        _camera.aspect = w /  h
+        #_camera.aspect = w /  h
+        unitperpixel = 0.1
+        _camera.left = w / -2 * unitperpixel
+        _camera.right = w / 2 * unitperpixel
+        _camera.top = h /2 * unitperpixel
+        _camera.bottom = h / -2 * unitperpixel
         _camera.updateProjectionMatrix()
         #_camerControls.handleResize()
 
