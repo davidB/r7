@@ -51,7 +51,8 @@ define(["console", "THREE", "chipmunk", "underscore", 'preloadjs', 'Q'], (consol
       for i in [0 .. cells.length-1] by 4
         dx = cells[i+2] * cellr || 1
         dy = cells[i+3] * cellr || 1
-        mesh = new THREE.Mesh(new THREE.CubeGeometry(dx, dy, 1), new THREE.MeshNormalMaterial())
+        dz = Math.min(2, cellr / 2)
+        mesh = new THREE.Mesh(new THREE.CubeGeometry(dx, dy, dz), new THREE.MeshNormalMaterial())
         mesh.position.x = cells[i+0] * cellr + dx / 2 + offx * cellr
         mesh.position.y = cells[i+1] * cellr + dy / 2 + offy * cellr
         THREE.GeometryUtils.merge(geometry, mesh)
