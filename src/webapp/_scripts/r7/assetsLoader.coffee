@@ -18,7 +18,7 @@ define(["console", "THREE", "chipmunk", "underscore", 'preloadjs', 'Q'], (consol
   _area02 = {
     width : 16 #nbcell
     height : 9 #nbcell
-    cellr : 7
+    cellr : 10
     walls : {
       cells : [1,2,0,4] #cellunit [x0,y0,w0,h0, x1,y1,....]
     }
@@ -73,10 +73,10 @@ define(["console", "THREE", "chipmunk", "underscore", 'preloadjs', 'Q'], (consol
         body.shapes.push(shape)
       body
     addBorderAsCells = (w, h, cells) ->
-      cells.push(0, 0, w, 0)
-      cells.push(0, 0, 0, h)
-      cells.push(w, 0, 0, h)
-      cells.push(0, h, w, 0)
+      cells.push(-1, -1, w+2, 1)
+      cells.push(-1, -1, 1, h+2)
+      cells.push(w, -1, 1, h+2)
+      cells.push(-1, h, w+2, 1)
     addBorderAsCells(area.width, area.height, area.walls.cells)
     area.walls.obj3d = () -> cells2boxes3d(area.walls.cells, area.width / -2, area.height/-2)
     area.walls.obj2d = () -> cells2boxes2d(area.walls.cells, area.width / -2, area.height/-2)
