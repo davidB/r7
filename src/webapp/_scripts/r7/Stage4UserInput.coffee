@@ -20,13 +20,13 @@ define(["r7/evt"], (evt) ->
     {
       codes: [37, 81] # left arrow, Q
       active : false
-      start: -> evt.ReqEvt( evt.RotateShipStart(_shipId, 1))
+      start: -> evt.ReqEvt( evt.RotateShipStart(_shipId, 0.5))
       stop: -> evt.ReqEvt( evt.RotateShipStop(_shipId))
     },
     {
       codes: [39, 68] #right arrow, D
       active : false
-      start: -> evt.ReqEvt( evt.RotateShipStart(_shipId, -1))
+      start: -> evt.ReqEvt( evt.RotateShipStart(_shipId, -0.5))
       stop: -> evt.ReqEvt( evt.RotateShipStop(_shipId))
     },
     {
