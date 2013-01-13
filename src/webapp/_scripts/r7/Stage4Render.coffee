@@ -7,14 +7,19 @@ define(
       _areaBox = null
       _cube = null
       _cameraTargetObjId = null
-      #_camera = new THREE.PerspectiveCamera(75, 1, 1, 100)
-      _camera = new THREE.OrthographicCamera(10,10,10,10, 1, 100)
+      #_camera = new THREE.PerspectiveCamera(75, 1, 1, 500)
+      _camera = new THREE.OrthographicCamera(10,10,10,10, 1, 1000)
 
       #HACK to clean
       #see http://help.dottoro.com/ljorlllt.php
-      _camera.position.z = 10
-      _scene.add(_camera)
+      nLookAt = (camera, v3) ->
+        camera.position.z = v3.z + 30
+        camera.position.y = v3.y + 2
+        camera.position.x = v3.x + 2
+        camera.lookAt(v3)
 
+      nLookAt(_camera, _scene.position)
+      _scene.add(_camera)
       #_cameraControls = new THREE.DragPanControls(_camera)
 
       _renderer = if webglDetector.webgl
@@ -37,7 +42,7 @@ define(
         w = container.clientWidth #window.innerWidth
         h = container.clientHeight #window.innerHeight
         _renderer.setSize(w, h)
-        #_camera.aspect = w /  h
+        _camera.aspect = w /  h
         unitperpixel = 0.1
         _camera.left = w / -2 * unitperpixel
         _camera.right = w / 2 * unitperpixel
@@ -87,6 +92,7 @@ define(
             # pass
       start = ->
         spawnAxis()
+        _scene.add(makeLight())
         evt.SetupDatGui((gui) ->
           f2 = gui.addFolder("Camera")
           f2.add(_camera.position, "x")
@@ -124,13 +130,14 @@ define(
           obj = _scene.getChildByName(_cameraTargetObjId, false)
 
           #
-          #        if (!!obj && !!_areaBox) {
-          #          cameraConstraint(obj.position, _camera.position.z, _camera, _areaBox);
-          #        } else {
-          #          _camera.lookAt(_scene.position);
+          #if (!!obj && !!_areaBox)
+          #  cameraConstraint(obj.position, _camera.position.z, _camera, _areaBox)
+          #else
+          #  _camera.lookAt(_scene.position)
           #        }
           #
           #_cameraControls.update()
+          nLookAt(_camera, obj.position)
           _renderer.render(_scene, _camera)
 
       spawnAxis = ->
@@ -156,6 +163,30 @@ define(
         axis = new THREE.AxisHelper()
         axis.scale.set(0.1, 0.1, 0.1) # default length of axis is 100
         _scene.add(axis)
+
+      makeLight = () ->
+        mainlight = new THREE.DirectionalLight( 0xffffff )
+        #shadow stuff
+        mainlight.shadowCameraNear = 50
+        mainlight.shadowCameraFar = 1000
+
+        mainlight.castShadow = true
+        mainlight.shadowDarkness = 0.5
+        mainlight.shadowCameraVisible = false
+        mainlight.shadowMapWidth = 2048
+        mainlight.shadowMapHeight = 2048
+
+        #light target
+        lightTarget = new THREE.Object3D()
+        lightTarget.name = "lightTarget"
+        mainlight.target = lightTarget
+        lightTarget.position.set(20,0,0)
+
+        lightTarget.add( mainlight ) #adding mainlight as child to lightTarget (easy rotation controls via parent)
+        mainlight.position.set(0,500,0) # moving mainlight away from its parent
+        lightTarget.rotation.set(0,-0.5,1) #setting elevation and azimuth via mainlight's parent
+        #lightTarget
+        mainlight
 
       #TODO support spawn animation
       spawnObj = (id, pos, obj3d) ->
@@ -188,8 +219,6 @@ define(
         #var s = w/75;
         #mesh.scale.set(s, s, s);
         parent.add(obj)
-        console.debug("spawn", ids, obj, parent)
-
 
       #TODO support despawn animation
       despawnObj = (id) ->
@@ -212,7 +241,9 @@ define(
           _scene.add(light)
         )
         wall = scene3d.objects.wall
-        vertices = wall.geometry.vertices
+        updateAreaBox(wall.geometry.vertices, wall.scale, wall.position)
+
+      updateAreaBox = (vertices, scale, position) ->
         _areaBox = _.reduce(vertices, (acc, v) ->
           acc.xmin = Math.min(acc.xmin, v.x)
           acc.ymin = Math.min(acc.ymin, v.y)
@@ -225,10 +256,12 @@ define(
           xmax: vertices[0].x
           ymax: vertices[0].y
         })
-        _areaBox.xmin = _areaBox.xmin * wall.scale.x + wall.position.x
-        _areaBox.ymin = _areaBox.ymin * wall.scale.y + wall.position.y
-        _areaBox.xmax = _areaBox.xmax * wall.scale.x + wall.position.x
-        _areaBox.ymax = _areaBox.ymax * wall.scale.y + wall.position.y
+        _areaBox.xmin = _areaBox.xmin * scale.x + position.x
+        _areaBox.ymin = _areaBox.ymin * scale.y + position.y
+        _areaBox.xmax = _areaBox.xmax * scale.x + position.x
+        _areaBox.ymax = _areaBox.ymax * scale.y + position.y
+        console.debug("_areaBox", _areaBox)
+        _areaBox
 
 
       #
