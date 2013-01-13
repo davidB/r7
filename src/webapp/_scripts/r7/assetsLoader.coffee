@@ -18,13 +18,13 @@ define(["console", "THREE", "chipmunk", "underscore", 'preloadjs', 'Q'], (consol
   _area02 = {
     width : 16 #nbcell
     height : 9 #nbcell
-    cellr : 10
+    cellr : 7
     walls : {
       cells : [1,2,0,4] #cellunit [x0,y0,w0,h0, x1,y1,....]
-
     }
-    areas : [
-      { item : "targetg1", cells : [0,0,1,1, 3,4,1,1] }
+    zones : [
+      { k : "targetg1/spawn", cells : [0,0,1,1, 3,4,1,1] }
+      { k : "gate/in",    cells : [3,3,1,1] }
     ]
   }
 
@@ -46,40 +46,46 @@ define(["console", "THREE", "chipmunk", "underscore", 'preloadjs', 'Q'], (consol
   makeArea = (d) ->
     area = d.result
     cellr = area.cellr
-    cells2boxes3d = (cells) ->
+    cells2boxes3d = (cells, offx, offy) ->
       geometry = new THREE.Geometry()
       for i in [0 .. cells.length-1] by 4
         dx = cells[i+2] * cellr || 1
         dy = cells[i+3] * cellr || 1
         mesh = new THREE.Mesh(new THREE.CubeGeometry(dx, dy, 1), new THREE.MeshNormalMaterial())
-        mesh.position.x = cells[i+0] * cellr + dx / 2
-        mesh.position.y = cells[i+1] * cellr + dy / 2
+        mesh.position.x = cells[i+0] * cellr + dx / 2 + offx * cellr
+        mesh.position.y = cells[i+1] * cellr + dy / 2 + offy * cellr
         THREE.GeometryUtils.merge(geometry, mesh)
       walls = new THREE.Mesh(geometry, new THREE.MeshNormalMaterial())
       obj3d = new THREE.Object3D()
       obj3d.add(walls)
       obj3d
-    cells2boxes2d = (cells) ->
+    cells2boxes2d = (cells, offx, offy) ->
       body = new cp.Body(Infinity, Infinity)
       body.nodeIdleTime = Infinity
       body.shapes = []
       for i in [0 .. cells.length-1] by 4
         # TODO optim replace boxes (polyshape) by segment + thick (=> change the display)
-        offset = cp.v(cells[i+0] * cellr, cells[i+1] * cellr)
+        offset = cp.v((cells[i+0] + offx) * cellr, (cells[i+1] + offy) * cellr)
         w = cells[i+2] * cellr || 1
         h = cells[i+3] * cellr || 1
         verts = [ 0,0, 0,h, w,h, w,0 ]
         shape = new cp.PolyShape(body, verts, offset)
         body.shapes.push(shape)
       body
-    area.walls.obj3d = () -> cells2boxes3d(area.walls.cells)
-    area.walls.obj2d = () -> cells2boxes2d(area.walls.cells)
+    addBorderAsCells = (w, h, cells) ->
+      cells.push(0, 0, w, 0)
+      cells.push(0, 0, 0, h)
+      cells.push(w, 0, 0, h)
+      cells.push(0, h, w, 0)
+    addBorderAsCells(area.width, area.height, area.walls.cells)
+    area.walls.obj3d = () -> cells2boxes3d(area.walls.cells, area.width / -2, area.height/-2)
+    area.walls.obj2d = () -> cells2boxes2d(area.walls.cells, area.width / -2, area.height/-2)
     area
 
   makeShip = (r) ->
     r.obj2d = () ->
       body = new cp.Body(100, Infinity)
-      shape = new cp.PolyShape(body, [2, 0, -1, -1, -1, 1], cp.vzero)
+      shape = new cp.PolyShape(body, [3, 0, -1, -1, -1, 1], cp.vzero)
       shape.sensor = false
       body.shapes = [shape]
       body
@@ -111,7 +117,6 @@ define(["console", "THREE", "chipmunk", "underscore", 'preloadjs', 'Q'], (consol
 
         #TODO should create a new object or at least change the timestamp
         r = {}
-        console.debug("geometry", geometry)
         r.obj3d = () -> fixOrientation(new THREE.Mesh(geometry, new THREE.MeshFaceMaterial(materials)))
         deferred.resolve(r)
       , texturePath)
