@@ -209,10 +209,10 @@ define(["r7/evt", "console", "chipmunk", "r7/Vec3F", "r7/Position", "underscore"
         obj3d.position.z = 0 # for Z != 0 une an ortho camera
         path = new THREE.Path()
         verts = body.shapes[0].verts
-        path.moveTo( verts[0], verts[1] )
-        path.lineTo( verts[2], verts[3])
-        path.lineTo( verts[4], verts[5] )
-        path.lineTo( verts[6], verts[7] )
+        path.moveTo( verts[0], verts[1])
+        for i in [2 .. verts.length + 1] by 2
+          i2 = i % verts.length
+          path.lineTo( verts[i2], verts[i2+1])
         geometry = path.toShapes()[0].makeGeometry()
         #      rectShape.multilineTo( rectLength/2, -rectLength/2 )
         #rectShape.lineTo( -rectLength/2,      -rectLength/2 )
