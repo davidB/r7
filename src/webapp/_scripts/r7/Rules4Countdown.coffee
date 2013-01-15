@@ -23,6 +23,9 @@ define(["r7/evt"], (evt) ->
         when "StartCountdown"
           _tasks[e.key] = e
           _states.update(out, e.key, e.timeout, onUpdateState)
+        when "StopCountdown"
+          delete _tasks[e.key]
+          delete _states[e.key]
         when "Tick"
           decCountdown(out, e.delta500 / 2)  if e.delta500 > 0
         else
