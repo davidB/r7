@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
-<svg:svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" width="1120" height="630" id="svg2985" version="1.1" inkscape:version="0.48.3.1 r9886" sodipodi:docname="gui.svg" inkscape:label="top_left">
+<svg:svg xmlns:osb="http://www.openswatchbook.org/uri/2009/osb" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" width="1120" height="630" id="svg2985" version="1.1" inkscape:version="0.48.4 r9939" sodipodi:docname="gui.svg" inkscape:label="top_left">
   <svg:defs id="defs2987">
+    <svg:linearGradient inkscape:collect="always" id="linearGradient5327">
+      <svg:stop style="stop-color:#000000;stop-opacity:1;" offset="0" id="stop5329" />
+      <svg:stop style="stop-color:#000000;stop-opacity:0;" offset="1" id="stop5331" />
+    </svg:linearGradient>
+    <svg:linearGradient inkscape:collect="always" id="linearGradient3871" osb:paint="gradient">
+      <svg:stop style="stop-color:#000000;stop-opacity:1;" offset="0" id="stop3873" />
+      <svg:stop style="stop-color:#000000;stop-opacity:0;" offset="1" id="stop3875" />
+    </svg:linearGradient>
     <svg:linearGradient inkscape:collect="always" id="linearGradient3889">
       <svg:stop style="stop-color:#000000;stop-opacity:1;" offset="0" id="stop3891" />
       <svg:stop style="stop-color:#000000;stop-opacity:0;" offset="1" id="stop3893" />
@@ -19,8 +27,9 @@
     <svg:filter color-interpolation-filters="sRGB" inkscape:collect="always" id="filter3975-0" x="-0.44395605" width="1.8879122" y="-0.44395605" height="1.8879122">
       <svg:feGaussianBlur inkscape:collect="always" stdDeviation="12.360922" id="feGaussianBlur3977-6" />
     </svg:filter>
+    <svg:radialGradient inkscape:collect="always" xlink:href="#linearGradient5327" id="radialGradient5335" cx="97.510902" cy="177.18147" fx="97.510902" fy="177.18147" r="83.359283" gradientTransform="matrix(1,0,0,0.31868267,0,120.71681)" gradientUnits="userSpaceOnUse" />
   </svg:defs>
-  <sodipodi:namedview id="base" pagecolor="#ffffff" bordercolor="#666666" borderopacity="1.0" inkscape:pageopacity="0.0" inkscape:pageshadow="2" inkscape:zoom="1.0924479" inkscape:cx="631.91418" inkscape:cy="380.3385" inkscape:current-layer="top_left " inkscape:document-units="px" showgrid="false" inkscape:window-width="1680" inkscape:window-height="1038" inkscape:window-x="0" inkscape:window-y="0" inkscape:window-maximized="1" />
+  <sodipodi:namedview id="base" pagecolor="#ffffff" bordercolor="#666666" borderopacity="1.0" inkscape:pageopacity="0.0" inkscape:pageshadow="2" inkscape:zoom="1.0924479" inkscape:cx="281.662" inkscape:cy="37.331858" inkscape:current-layer="top_left " inkscape:document-units="px" showgrid="false" inkscape:window-width="1680" inkscape:window-height="1038" inkscape:window-x="0" inkscape:window-y="0" inkscape:window-maximized="1" />
   <svg:metadata id="metadata2990">
     <rdf:RDF>
       <cc:Work rdf:about="">
@@ -37,20 +46,20 @@
     </svg:g>
     <text x="100" y="100">Hello</text>
     <svg:text id="text3816" x="1130.2087" y="195.12671" style="font-size:29.4695034px;font-weight:normal;text-anchor:end;fill:#ff0000;font-family:'Arial,sans-serif'" transform="scale(0.97903869,1.0214101)" data-bind="text: score">Hello333</svg:text>
-    <svg:text id="text3816-6" x="182.23251" y="201.02281" style="font-size:67.48730469px;font-weight:normal;text-anchor:end;fill:#ff0000;font-family:'Arial,sans-serif'" transform="scale(1.0161139,0.98414163)" data-bind="text: countdown">00:60</svg:text>
+    <svg:text id="text3816-6" x="330.56717" y="250.07677" style="font-size:131.3916626px;font-weight:normal;text-anchor:end;opacity:0.25252524;fill:#ff0000;stroke:none;font-family:'Arial,sans-serif'" transform="scale(1.0182879,0.98204049)" data-bind="text: countdown">00:60</svg:text>
     <svg:flowRoot xml:space="preserve" id="flowRoot3014" style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"><svg:flowRegion id="flowRegion3016"><svg:rect id="rect3018" width="13.730632" height="10.06913" x="180.32896" y="35.699631" /></svg:flowRegion><svg:flowPara id="flowPara3020" /></svg:flowRoot>    <svg:text xml:space="preserve" style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial" x="42.107269" y="703.92371" id="text3024" sodipodi:linespacing="125%"><svg:tspan sodipodi:role="line" id="tspan3026" x="42.107269" y="703.92371" /></svg:text>
-    <svg:g id="g3979">
+    <svg:g id="g3979" style="opacity:0.08">
       <svg:g id="g3985">
-        <svg:rect data-bind="attr: { opacity: shieldActive()? 0.9 : 0 }" style="opacity:0.92565056;fill:#550000;fill-opacity:1;fill-rule:nonzero;stroke:url(#radialGradient3905);stroke-width:10;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter3975)" id="rect3022-8" width="66.822411" height="66.822411" x="17.849821" y="673.25867" ry="2.3711846" />
+        <svg:rect data-bind="attr: { opacity: shieldActive()? 0.9 : 0 }" style="opacity:0.92565056000000001;fill:#550000;fill-opacity:1;fill-rule:nonzero;stroke:url(#radialGradient3905);stroke-width:10;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter3975)" id="rect3022-8" width="66.822411" height="66.822411" x="17.849821" y="673.25867" ry="2.3711846" />
       </svg:g>
-      <svg:rect ry="2.3711846" y="674.63171" x="18.307508" height="66.822411" width="66.822411" id="rect3022" style="opacity:0.65;fill:#ff0000;fill-opacity:1;fill-rule:nonzero;stroke:none" />
+      <svg:rect ry="2.3711846" y="674.63171" x="18.307508" height="66.822411" width="66.822411" id="rect3022" style="opacity:0.65000000000000002;fill:#ff0000;fill-opacity:1;fill-rule:nonzero;stroke:none" />
       <svg:text sodipodi:linespacing="125%" id="text3028" y="688.3623" x="64.991661" style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial" xml:space="preserve"><svg:tspan y="688.3623" x="64.991661" id="tspan3030" sodipodi:role="line">1</svg:tspan></svg:text>
     </svg:g>
-    <svg:g transform="translate(0.91537439,-88.791448)" id="g3979-6">
+    <svg:g transform="translate(0.91537439,-88.791448)" id="g3979-6" style="opacity:0.08">
       <svg:g id="g3985-6">
-        <svg:rect data-bind="attr: { opacity: fireActive()? 0.9 : 0 }" style="opacity:0.92565056;fill:#550000;fill-opacity:1;fill-rule:nonzero;stroke:url(#radialGradient3905-1);stroke-width:10;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter3975-0)" id="rect3022-8-1" width="66.822411" height="66.822411" x="17.849821" y="673.25867" ry="2.3711846" />
+        <svg:rect data-bind="attr: { opacity: fireActive()? 0.9 : 0 }" style="opacity:0.92565056000000001;fill:#550000;fill-opacity:1;fill-rule:nonzero;stroke:url(#radialGradient3905-1);stroke-width:10;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter3975-0)" id="rect3022-8-1" width="66.822411" height="66.822411" x="17.849821" y="673.25867" ry="2.3711846" />
       </svg:g>
-      <svg:rect ry="2.3711846" y="674.63171" x="18.307508" height="66.822411" width="66.822411" id="rect3022-1" style="opacity:0.65;fill:#ff0000;fill-opacity:1;fill-rule:nonzero;stroke:none" />
+      <svg:rect ry="2.3711846" y="674.63171" x="18.307508" height="66.822411" width="66.822411" id="rect3022-1" style="opacity:0.65000000000000002;fill:#ff0000;fill-opacity:1;fill-rule:nonzero;stroke:none" />
       <svg:text sodipodi:linespacing="125%" id="text3028-5" y="688.3623" x="64.991661" style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial" xml:space="preserve"><svg:tspan y="688.3623" x="64.991661" id="tspan3030-5" sodipodi:role="line">2</svg:tspan></svg:text>
     </svg:g>
   </svg:g>
