@@ -35,6 +35,8 @@ define(
         #TODO display message if Webgl required
         _renderer = new THREE.CanvasRenderer()
 
+      _renderer.shadowMapEnabled = true
+      _renderer.shadowMapSoft = true # to antialias the shadow
       _renderer.setClearColorHex(0xEEEEEE, 1.0)
       _renderer.clear()
 
@@ -74,11 +76,12 @@ define(
             out.push(start())
           when "Render"
             render()
+          when "SetLocalDroneId"
+            _cameraTargetObjId = e.objId
           when "SpawnArea"
             spawnObj(e.objId, e.pos, e.obj3d)
             #spawnScene(e.objId, e.pos, e.scene3d)
           when "SpawnShip"
-            _cameraTargetObjId = e.objId  if e.isLocal
             spawnObj(e.objId, e.pos, e.obj3d)
           when "SpawnObj"
             spawnObj(e.objId, e.pos, e.obj3d)
@@ -137,7 +140,7 @@ define(
           #        }
           #
           #_cameraControls.update()
-          nLookAt(_camera, obj.position)
+          nLookAt(_camera, obj.position) if obj?
           _renderer.render(_scene, _camera)
 
       spawnAxis = ->
@@ -167,26 +170,25 @@ define(
       makeLight = () ->
         mainlight = new THREE.DirectionalLight( 0xffffff )
         #shadow stuff
-        mainlight.shadowCameraNear = 50
-        mainlight.shadowCameraFar = 1000
+        mainlight.shadowCameraNear = 10
+        mainlight.shadowCameraFar = 500
 
         mainlight.castShadow = true
         mainlight.shadowDarkness = 0.5
-        mainlight.shadowCameraVisible = false
-        mainlight.shadowMapWidth = 2048
-        mainlight.shadowMapHeight = 2048
+        mainlight.shadowCameraVisible = true
+        #mainlight.shadowMapWidth = 2048
+        #mainlight.shadowMapHeight = 2048
 
         #light target
         lightTarget = new THREE.Object3D()
         lightTarget.name = "lightTarget"
         mainlight.target = lightTarget
-        lightTarget.position.set(20,0,0)
+        lightTarget.position.set(0,0,50)
 
         lightTarget.add( mainlight ) #adding mainlight as child to lightTarget (easy rotation controls via parent)
-        mainlight.position.set(0,500,0) # moving mainlight away from its parent
+        #mainlight.position.set(0,100,0) # moving mainlight away from its parent
         lightTarget.rotation.set(0,-0.5,1) #setting elevation and azimuth via mainlight's parent
-        #lightTarget
-        mainlight
+        lightTarget
 
       #TODO support spawn animation
       spawnObj = (id, pos, obj3d) ->

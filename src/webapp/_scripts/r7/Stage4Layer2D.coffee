@@ -23,9 +23,11 @@ define(["r7/evt", "ko"], (evt, ko) ->
         when "SpawnHud"
           container.appendChild(e.domElem) if e.domElem?
           ko.applyBindings(_viewModel, container)
-        when "SpawnShip"
-          _shipIdP = e.objId + "/"  if e.isLocal
+        when "SetLocalDroneId"
+          _shipIdP = e.objId + "/"
         when "UpdateVal"
+          if e.key.indexOf("/score") > -1
+            console.log(e)
           if e.key.indexOf(_shipIdP) is 0
             fieldName = e.key.substring(_shipIdP.length)
             field = _viewModel[fieldName]

@@ -6,7 +6,7 @@ define ["r7/evt", "r7/Stage4GameRules"], (evt, Stage4GameRules) ->
 
       while i > -1 and shipId is null
         e = out[i]
-        shipId = e.objId  if e.k is "SpawnShip" and e.isLocal
+        shipId = e.objId  if e.k is "SetLocalDroneId"
         i--
       shipId
 

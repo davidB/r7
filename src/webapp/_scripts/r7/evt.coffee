@@ -54,6 +54,10 @@ define([], ()->
       k: "StopCountdown"
       key: key
     }
+    SetLocalDroneId: (objId) -> {
+      k : "SetLocalDroneId"
+      objId : objId
+    }
     SpawnHud: (objId, domElem) -> {
       k: "SpawnHud"
       objId: objId
@@ -72,13 +76,12 @@ define([], ()->
       obj2d: obj2d
 
     }
-    SpawnShip: (objId, pos, obj3d, obj2d, isLocal) -> {
+    SpawnShip: (objId, pos, obj3d, obj2d) -> {
       k: "SpawnShip"
       objId: objId
       pos: pos
       obj3d: obj3d
       obj2d: obj2d
-      isLocal: isLocal
     }
     SpawnCube: () -> {
       k: "SpawnCube"
@@ -184,7 +187,7 @@ define([], ()->
       v = s[k] + i
       v = Math.min(smax[k], v) if smax[k]?
       v = Math.max(smin[k], v) if smin[k]?
-      s.updateState(out, k, v, onUpdateState)
+      s.update(out, k, v, onUpdateState)
 
     s
 

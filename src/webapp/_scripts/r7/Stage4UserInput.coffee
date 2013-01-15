@@ -42,8 +42,8 @@ define(["r7/evt"], (evt) ->
           diseableControl()
         when "Start"
           _keys = _keysUser
-        when "SpawnShip"
-          bindShipControl(e.objId)  if e.isLocal
+        when "SetLocalDroneId"
+          bindShipControl(e.objId)
         else
 
       # pass
