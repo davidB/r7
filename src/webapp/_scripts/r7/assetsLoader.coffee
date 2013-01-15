@@ -15,6 +15,14 @@ define(["console", "THREE", "chipmunk", "underscore", 'preloadjs', 'Q'], (consol
 
   _cache = {}
 
+  _types = {
+    wall : 1
+    drone : 2
+    bullet : 3
+    SHIELD : 4
+    ITEM :5
+  }
+
   _area02 = {
     width : 16 #nbcell
     height : 9 #nbcell
@@ -71,6 +79,7 @@ define(["console", "THREE", "chipmunk", "underscore", 'preloadjs', 'Q'], (consol
         h = cells[i+3] * cellr || 1
         verts = [ 0,0, 0,h, w,h, w,0 ]
         shape = new cp.PolyShape(body, verts, offset)
+        shape.setCollisionType(_types.wall)
         body.shapes.push(shape)
       body
     addBorderAsCells = (w, h, cells) ->
@@ -90,10 +99,12 @@ define(["console", "THREE", "chipmunk", "underscore", 'preloadjs', 'Q'], (consol
         when "ship01"
           s = new cp.PolyShape(body, [3, 0, -1, -1, -1, 1], cp.vzero)
           s.sensor = false
+          s.setCollisionType(_types.drone)
           s
         when "targetg101"
           s = new cp.CircleShape(body, 1, cp.vzero)
           s.sensor = true
+          s.setCollisionType(_types.item)
           s
         else
           console.warn("no rules to create obj2d for", r.model)
@@ -197,6 +208,7 @@ define(["console", "THREE", "chipmunk", "underscore", 'preloadjs', 'Q'], (consol
     result
 
   {
+    types : _types
     find : (id) ->
       r = _cache[id] || Q.reject("id not found " + id )
       r.done()

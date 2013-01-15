@@ -1,4 +1,4 @@
-define(["r7/evt", "console", "chipmunk", "r7/Vec3F", "r7/Position", "underscore", "THREE"], (evt, console, cp, Vec3F, Position, _, THREE) ->
+define(["r7/evt", "console", "chipmunk", "r7/Vec3F", "r7/Position", "underscore", "THREE", "r7/assetsLoader"], (evt, console, cp, Vec3F, Position, _, THREE, assetsLoader) ->
 
   # shortcut, alias
   _degToRad = 0.0174532925199432957
@@ -67,12 +67,19 @@ define(["r7/evt", "console", "chipmunk", "r7/Vec3F", "r7/Position", "underscore"
       #pass
       evt.moveInto(_pending, out)
 
+
     initSpace = ()->
       space = new cp.Space()
       space.gravity = cp.vzero
       space.iterations = 10
       space.damping = 0.3
 
+      begin = (arb, space) ->
+        shapes = arb.getShapes()
+        _pending.push(evt.BeginContact(shapes[0].body.data.id, shapes[1].body.data.id))
+        false
+
+      space.addCollisionHandler(assetsLoader.types.drone, assetsLoader.types.item, begin, undefined, undefined, undefined)
       #listener = new Box2D.Dynamics.b2ContactListener()
       #listener.BeginContact = (contact) ->
       #  objId0 = contact.GetFixtureA().GetBody().GetUserData().id
