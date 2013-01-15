@@ -38,7 +38,7 @@ define('main', [
   return function(){
     var container = window.document.getElementById('layers');
     var ring = Ring([
-      Stage4LogEvent(['Init', 'SpawnObj', 'DespawnObj']).onEvent,
+      Stage4LogEvent(['Init', 'SpawnObj', 'DespawnObj', 'BeginContact', 'Start', 'Stop']).onEvent,
       ui(container).onEvent,
       rules.onEvent
     ]);
