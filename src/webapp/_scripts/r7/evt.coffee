@@ -67,24 +67,11 @@ define([], ()->
       k: "DespawnHud"
       objId: objId
     }
-    SpawnArea: (objId, pos, obj3d, obj2d) -> {
+    SpawnArea: (objId, pos, gpof) -> {
       k: "SpawnArea"
       objId: objId
       pos: pos
-      #scene3d: scene3d
-      obj3d: obj3d
-      obj2d: obj2d
-
-    }
-    SpawnShip: (objId, pos, obj3d, obj2d) -> {
-      k: "SpawnShip"
-      objId: objId
-      pos: pos
-      obj3d: obj3d
-      obj2d: obj2d
-    }
-    SpawnCube: () -> {
-      k: "SpawnCube"
+      gpof: gpof
     }
     ShootingStart: (emitterId) -> {
       k: "ShootingStart"
@@ -98,18 +85,15 @@ define([], ()->
       k: "FireBullet"
       emitterId: emitterId
     }
-    SpawnObj: (objId, pos, obj3d, obj2d, anim) -> {
+    SpawnObj: (objId, pos, gpof) -> {
       k: "SpawnObj"
       objId: objId
       pos: pos
-      obj3d: obj3d
-      obj2d: obj2d
-      anim : anim
+      gpof: gpof
     }
-    DespawnObj: (objId, anim) -> {
+    DespawnObj: (objId) -> {
       k: "DespawnObj"
       objId: objId
-      anim: anim
     }
     MoveObjTo: (objId, pos, acc) -> {
       k: "MoveObjTo"

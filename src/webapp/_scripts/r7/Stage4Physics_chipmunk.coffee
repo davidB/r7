@@ -35,9 +35,7 @@ define(["r7/evt", "console", "chipmunk", "r7/Vec3F", "r7/Position", "underscore"
         when "Stop"
           _running = false
         when "SpawnArea"
-          spawnArea(e.objId, e.obj2d)
-        when "SpawnShip"
-          spawnObj(e.objId, e.obj2d, e.pos) if e.obj2d?
+          spawnArea(e.objId, e.gpof)
         when "BoostShipStart"
           setBoost(e.objId, 0.3)
         when "BoostShipStop"
@@ -54,7 +52,7 @@ define(["r7/evt", "console", "chipmunk", "r7/Vec3F", "r7/Position", "underscore"
         when "ImpulseObj"
           impulseObj(e.objId, e.angle, e.force)
         when "SpawnObj"
-          spawnObj(e.objId, e.obj2d, e.pos) if e.obj2d?
+          spawnObj(e.objId, e.pos, e.gpof)
         when "DespawnObj"
           despawn(e.objId)
         when "Tick"
@@ -186,8 +184,9 @@ define(["r7/evt", "console", "chipmunk", "r7/Vec3F", "r7/Position", "underscore"
         b.applyImpulse(impulse, cp.vzero)
       )
 
-    spawnObj = (id, obj2d, pos) ->
-      body = obj2d()
+    spawnObj = (id, pos, gpof) ->
+      return if !gpof.obj2dF?
+      body = gpof.obj2dF()
       p = pos
       body.setPos(cp.v(p.x, p.y)) # = pos
       body.setAngle(p.a)
@@ -198,8 +197,8 @@ define(["r7/evt", "console", "chipmunk", "r7/Vec3F", "r7/Position", "underscore"
       drawBody(body)
       body
 
-    spawnArea = (id, obj2dF) ->
-      obj2d = obj2dF()
+    spawnArea = (id, gpof) ->
+      obj2d = gpof.obj2dF()
       obj2d.setPos(cp.v(0, 0))
       obj2d.setAngle(0)
       _space.staticBody = obj2d

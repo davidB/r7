@@ -73,7 +73,7 @@ define(["r7/evt", "r7/Position", "r7/assetsLoader", "r7/Stage4Animation"], (evt,
       nextPos = nextPosition(Position.zero, 10)
       objId = newTargetG1Id()
       assetsLoader.find('targetg101').then((x) ->
-        onAutoEvent(evt.StartCountdown(objId + "/spawn", toffset, evt.SpawnObj(objId, nextPos, x.obj3d, x.obj2d, animations.scaleIn)))
+        onAutoEvent(evt.StartCountdown(objId + "/spawn", toffset, evt.SpawnObj(objId, nextPos, x)))
         onAutoEvent(evt.StartCountdown(objId + "/countdown", 10 + toffset, {k: "TargetG1.Timeout", objId : objId}))
       ).done()
 

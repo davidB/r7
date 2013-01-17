@@ -17,6 +17,7 @@ define(["r7/evt", "r7/Position", "r7/assetsLoader", "underscore", "Q"], (evt, Po
               {kind : 'area', id : 'area01'},
               {kind : 'model', id : 'ship01'},
               {kind : 'model', id : 'targetg101'},
+              {kind : 'model', id : 'cube0'},
               {kind : 'hud',   id : 'gui'}
             ],
             (x) -> assetsLoader.preload(x.id, x.kind)
@@ -62,10 +63,10 @@ define(["r7/evt", "r7/Position", "r7/assetsLoader", "underscore", "Q"], (evt, Po
     start = () ->
       _shipId = "ship/" + (_uid + 1)
       _pending.push(evt.SetLocalDroneId(_shipId))
-      _pending.push(evt.SpawnCube())
+      assetsLoader.find('cube0' ).then((x) -> _pending.push(evt.SpawnObj("cube0", Position.zero, x))).done()
       assetsLoader.find('gui'   ).then((x) -> _pending.push(evt.SpawnHud('hud', x))).done()
-      assetsLoader.find('area01').then((x) -> _pending.push(evt.SpawnArea("area/" + _uid, Position.zero, x.walls.obj3d, x.walls.obj2d))).done()
-      assetsLoader.find('ship01').then((x) -> _pending.push(evt.SpawnShip(_shipId, Position(0.0, 0.0, 0.5), x.obj3d, x.obj2d))).done()
+      assetsLoader.find('area01').then((x) -> _pending.push(evt.SpawnArea("area/" + _uid, Position.zero, x.walls))).done()
+      assetsLoader.find('ship01').then((x) -> _pending.push(evt.SpawnObj(_shipId, Position(0.0, 0.0, 0.5), x))).done()
       updateState("running", false)
       updateState(_shipId + "/score", 0)
       updateState(_shipId + "/energy", 500)

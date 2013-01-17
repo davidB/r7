@@ -9,23 +9,53 @@ define(
       _cameraTargetObjId = null
       #_camera = new THREE.PerspectiveCamera(75, 1, 1, 500)
       _camera = new THREE.OrthographicCamera(10,10,10,10, 1, 1000)
-
+      #_camera =  new THREE.CombinedCamera(-20, -20, 45, 1, 500, 1, 1000)
+      #_camera.toOrthographic()
+      _camera.gameDriven = true
       #HACK to clean
       #see http://help.dottoro.com/ljorlllt.php
       nLookAt = (camera, v3) ->
+        dx = ( (cmove.x + cmove.deltaX) / container.clientWidth - 0.5 ) * 100
+        dy =- ( (cmove.y + cmove.deltaY) / container.clientHeight - 0.5 ) * 100
         camera.position.z = v3.z + 30
-        camera.position.y = v3.y + 2
-        camera.position.x = v3.x + 2
+        camera.position.y = v3.y + dy
+        camera.position.x = v3.x + dx
         camera.lookAt(v3)
 
+
+      cmove = {
+        offsetX : -1
+        offsetY : -1
+        deltaX : 0
+        deltaY : 0
+        x : container.clientWidth / 2
+        y : container.clientHeight / 2
+      }
+      container.addEventListener( 'mousemove', (evt) ->
+        cmove.deltaX = evt.clientX - cmove.offsetX if (cmove.offsetX > -1)
+        cmove.deltaY = evt.clientY - cmove.offsetY if (cmove.offsetY > -1)
+      , false )
+      container.addEventListener( 'mousedown', (evt) ->
+        cmove.offsetX = evt.clientX
+        cmove.offsetY = evt.clientY
+      , false)
+      container.addEventListener( 'mouseup', (evt) ->
+        cmove.offsetX = -1
+        cmove.offsetY = -1
+        cmove.x = cmove.x + cmove.deltaX
+        cmove.y = cmove.y + cmove.deltaY
+        cmove.deltaX = 0
+        cmove.deltaY = 0
+      , false)
       nLookAt(_camera, _scene.position)
       _scene.add(_camera)
       #_cameraControls = new THREE.DragPanControls(_camera)
 
       _renderer = if webglDetector.webgl
         _renderer = new THREE.WebGLRenderer({
+          clearAlpha: 1
           antialias: true
-          preserveDrawingBuffer: true # to allow screenshot
+          #preserveDrawingBuffer: true # to allow screenshot
         })
 
       #_renderer.shadowMapEnabled = true;
@@ -36,8 +66,10 @@ define(
         _renderer = new THREE.CanvasRenderer()
 
       _renderer.shadowMapEnabled = true
-      _renderer.shadowMapSoft = true # to antialias the shadow
+      #_renderer.shadowMapSoft = true # to antialias the shadow
+      _renderer.shadowMapType = THREE.PCFShadowMap
       _renderer.setClearColorHex(0xEEEEEE, 1.0)
+      _renderer.autoClear = false
       _renderer.clear()
 
       updateViewportSize = (event) ->
@@ -51,7 +83,7 @@ define(
         _camera.top = h /2 * unitperpixel
         _camera.bottom = h / -2 * unitperpixel
         _camera.updateProjectionMatrix()
-        #_camerControls.handleResize()
+        #_controls.handleResize()
 
       updateViewportSize()
       container.appendChild(_renderer.domElement)
@@ -79,30 +111,38 @@ define(
           when "SetLocalDroneId"
             _cameraTargetObjId = e.objId
           when "SpawnArea"
-            spawnObj(e.objId, e.pos, e.obj3d)
+            spawnObj(e.objId, e.pos, e.gpof)
             #spawnScene(e.objId, e.pos, e.scene3d)
-          when "SpawnShip"
-            spawnObj(e.objId, e.pos, e.obj3d)
           when "SpawnObj"
-            spawnObj(e.objId, e.pos, e.obj3d)
+            spawnObj(e.objId, e.pos, e.gpof)
           when "MoveObjTo"
             moveObjTo(e.objId, e.pos)
-          when "SpawnCube"
-            spawnCube(container.clientWidth)
           when "DespawnObj"
-            despawnObj(e.objId)
+            despawnObj(e.objId, e.anim)
           else
             # pass
       start = ->
-        spawnAxis()
-        _scene.add(makeLight())
+        addLights(_scene, _camera)
         evt.SetupDatGui((gui) ->
           f2 = gui.addFolder("Camera")
-          f2.add(_camera.position, "x")
-          f2.add(_camera.position, "y")
-          f2.add(_camera.position, "z")
+          f2.add(_camera, "gameDriven")
+          f2.add(_camera.position, "x").listen()
+          f2.add(_camera.position, "y").listen()
+          f2.add(_camera.position, "z").listen()
+          f2.add(_camera, "fov").listen() if _camera.fov?
+          f2.add(_camera, "inPerspectiveMode").onFinishChange((value) ->
+            updateViewportSize()
+          ) if _camera.inPerspectiveMode?
+          gui.remember(_camera)
         )
 
+        #_controls = new THREE.FirstPersonControls( _camera, container )
+        #_controls.movementSpeed = 10
+        #_controls.lookSpeed = 0.125
+        #_controls.lookVertical = true
+        #_controls.constrainVertical = true
+        #_controls.verticalMin = 1.1
+        #_controls.verticalMax = 2.2
 
       #          .onFinishChange(function(){
       #            var e = evt.AskValueOf(timer.t(), 'scale', self, function(v) { return _params['scale'];});
@@ -122,10 +162,6 @@ define(
       #controls.addEventListener( 'change', render );
       #_cameraControls = controls
       render = ->
-        unless not _cube
-          _cube.rotation.x += 0.01
-          _cube.rotation.y += 0.02
-
         # you need to update lookAt every frame
         if !!_renderer and !!_scene and !!_camera and !!_cameraTargetObjId
 
@@ -140,34 +176,33 @@ define(
           #        }
           #
           #_cameraControls.update()
-          nLookAt(_camera, obj.position) if obj?
+          nLookAt(_camera, obj.position) if obj? and _camera.gameDriven
           _renderer.render(_scene, _camera)
 
-      spawnAxis = ->
+      addLights = (scene, camera) ->
+        ambient= new THREE.AmbientLight( 0x444444 )
+        scene.add(ambient)
 
-        #
-        #      function v(x,y,z){
-        #        return new THREE.Vector3(x,y,z);
-        #      }
-        #      var lineGeo = new THREE.Geometry();
-        #      lineGeo.vertices.push(
-        #        v(-500, 0, 0), v(500, 0, 0), v(50,0,0), v(45,5,0), v(50,0,0), v(45,-5,0),
-        #        v(0, -500, 0), v(0, 500, 0), v(0,50,0), v(5,45,0), v(0,50,0), v(-5,45,0),
-        #        v(0, 0, -500), v(0, 0, 500), v(0,0,50), v(5,0,45), v(0,0,50), v(-5,0,45)
-        #      );
-        #      var lineMat = new THREE.LineBasicMaterial({
-        #        color: 0x888888,
-        #        lineWidth: 1
-        #      });
-        #      var line = new THREE.Line(lineGeo, lineMat);
-        #      line.type = THREE.Lines;
-        #      _scene.add(line);
-        #
-        axis = new THREE.AxisHelper()
-        axis.scale.set(0.1, 0.1, 0.1) # default length of axis is 100
-        _scene.add(axis)
+        light = new THREE.SpotLight( 0xffffff, 1, 0, Math.PI, 1 )
+        light.position.set( 0, 10, 100 )
+        light.target.position.set( 0, 0, 0 )
 
-      makeLight = () ->
+        light.castShadow = true
+
+        light.shadowCameraNear = 700
+        light.shadowCameraFar = camera.far
+        light.shadowCameraFov = 50
+
+        light.shadowCameraVisible = true
+
+        light.shadowBias = 0.0001
+        light.shadowDarkness = 0.5
+
+        light.shadowMapWidth = 128
+        light.shadowMapHeight = 128
+
+        scene.add(light)
+
         mainlight = new THREE.DirectionalLight( 0xffffff )
         #shadow stuff
         mainlight.shadowCameraNear = 10
@@ -176,22 +211,23 @@ define(
         mainlight.castShadow = true
         mainlight.shadowDarkness = 0.5
         mainlight.shadowCameraVisible = true
-        #mainlight.shadowMapWidth = 2048
-        #mainlight.shadowMapHeight = 2048
+        mainlight.shadowMapWidth = 2048
+        mainlight.shadowMapHeight = 2048
+        mainlight.target = _scene
+        mainlight.position.set(0,-10,50)
+        mainlight.rotation.set(0,-0.5,1) #setting elevation and azimuth via mainlight's parent
 
-        #light target
-        lightTarget = new THREE.Object3D()
-        lightTarget.name = "lightTarget"
-        mainlight.target = lightTarget
-        lightTarget.position.set(0,0,50)
+        #group
+        lights = new THREE.Object3D()
+        lights.name = "lights"
 
-        lightTarget.add( mainlight ) #adding mainlight as child to lightTarget (easy rotation controls via parent)
-        #mainlight.position.set(0,100,0) # moving mainlight away from its parent
-        lightTarget.rotation.set(0,-0.5,1) #setting elevation and azimuth via mainlight's parent
-        lightTarget
+        lights.add( mainlight ) #adding mainlight as child to lightTarget (easy rotation controls via parent)
+        lights.add( ambient )
+        lights
 
       #TODO support spawn animation
-      spawnObj = (id, pos, obj3d) ->
+      spawnObj = (id, pos, gpof) ->
+        return if !(gpof? && gpof.obj3dF?)
         ids = id.split('>')
         parent = _scene
         i = 0
@@ -209,23 +245,26 @@ define(
 
   #console.trace();
           return
-        obj = obj3d() #TODO obj3d.clone ?
+        obj = gpof.obj3dF()
         obj.name = name
         obj.position.x = pos.x
         obj.position.y = pos.y
         #obj.position.z = 0.0
         obj.rotation.z = pos.a
-        obj.castShadow = true
-        obj.receiveShadow = true
-
-        #var s = w/75;
-        #mesh.scale.set(s, s, s);
         parent.add(obj)
+        obj.anims = gpof.anims #clone ?
+        obj.anims.spawn?(obj)
 
       #TODO support despawn animation
       despawnObj = (id) ->
         obj = _scene.getChildByName(id, false)
-        _scene.remove(obj) if obj?
+        if obj?
+          anim = obj.anims.despawn
+          if anim?
+            console.log("anim", obj)
+            anim(obj, (obj)-> _scene.remove(obj))
+          else
+            _scene.remove(obj)
 
       spawnScene = (id, pos, scene3d) ->
 
@@ -384,14 +423,6 @@ define(
       #        _scene.add(obj3d);
       #      });
       #
-      Cube = (s) ->
-        geometry = new THREE.CubeGeometry(s, s, s)
-        material = new THREE.MeshBasicMaterial({
-          color: 0xff0000
-          wireframe: true
-        })
-        new THREE.Mesh(geometry, material)
-
 
       #
       #    var spawnTargetG1 = function(id, pos) {
