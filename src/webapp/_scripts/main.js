@@ -3,7 +3,8 @@
 define('console', [], function() {
   if (!console.exception) {
     console.exception = function(exc){
-      console.error(exc.message, exc.stack);
+      console.error(exc.message)
+      console.error(exc.stack);
     }
   }
   return console;
