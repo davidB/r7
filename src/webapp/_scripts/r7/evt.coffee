@@ -98,16 +98,18 @@ define([], ()->
       k: "FireBullet"
       emitterId: emitterId
     }
-    SpawnObj: (objId, pos, obj3d, obj2d) -> {
+    SpawnObj: (objId, pos, obj3d, obj2d, anim) -> {
       k: "SpawnObj"
       objId: objId
       pos: pos
       obj3d: obj3d
       obj2d: obj2d
+      anim : anim
     }
-    DespawnObj: (objId) -> {
+    DespawnObj: (objId, anim) -> {
       k: "DespawnObj"
       objId: objId
+      anim: anim
     }
     MoveObjTo: (objId, pos, acc) -> {
       k: "MoveObjTo"

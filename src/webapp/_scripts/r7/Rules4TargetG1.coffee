@@ -1,4 +1,4 @@
-define(["r7/evt", "r7/Position", "r7/assetsLoader"], (evt, Position, assetsLoader) ->
+define(["r7/evt", "r7/Position", "r7/assetsLoader", "r7/Stage4Animation"], (evt, Position, assetsLoader, animations) ->
 
   ###
   @param {number} min
@@ -64,7 +64,7 @@ define(["r7/evt", "r7/Position", "r7/assetsLoader"], (evt, Position, assetsLoade
       spawnNewTargetG1(1)
 
     onTimeout = (objId) ->
-      onAutoEvent(evt.DespawnObj(objId))
+      onAutoEvent(evt.DespawnObj(objId, animations.scaleOut))
       _value = Math.max(1, _value - 10)
       #onAutoEvent(evt.UpdateVal(objId + "/value", _value))
       spawnNewTargetG1(1)
@@ -73,7 +73,7 @@ define(["r7/evt", "r7/Position", "r7/assetsLoader"], (evt, Position, assetsLoade
       nextPos = nextPosition(Position.zero, 10)
       objId = newTargetG1Id()
       assetsLoader.find('targetg101').then((x) ->
-        onAutoEvent(evt.StartCountdown(objId + "/spawn", toffset, evt.SpawnObj(objId, nextPos, x.obj3d, x.obj2d)))
+        onAutoEvent(evt.StartCountdown(objId + "/spawn", toffset, evt.SpawnObj(objId, nextPos, x.obj3d, x.obj2d, animations.scaleIn)))
         onAutoEvent(evt.StartCountdown(objId + "/countdown", 10 + toffset, {k: "TargetG1.Timeout", objId : objId}))
       ).done()
 
