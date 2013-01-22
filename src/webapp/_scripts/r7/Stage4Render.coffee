@@ -177,6 +177,7 @@ define(
           #
           #_cameraControls.update()
           nLookAt(_camera, obj.position) if obj? and _camera.gameDriven
+          _renderer.clear()
           _renderer.render(_scene, _camera)
 
       addLights = (scene, camera) ->
