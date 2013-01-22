@@ -7,7 +7,7 @@
       <svg:stop style="stop-color:#000000;stop-opacity:1;" offset="0" id="stop5329" />
       <svg:stop style="stop-color:#000000;stop-opacity:0;" offset="1" id="stop5331" />
     </svg:linearGradient>
-    <svg:linearGradient inkscape:collect="always" id="linearGradient3871" osb:paint="gradient">
+    <svg:linearGradient id="linearGradient3871" osb:paint="gradient">
       <svg:stop style="stop-color:#000000;stop-opacity:1;" offset="0" id="stop3873" />
       <svg:stop style="stop-color:#000000;stop-opacity:0;" offset="1" id="stop3875" />
     </svg:linearGradient>
@@ -29,13 +29,13 @@
     </svg:filter>
     <svg:radialGradient inkscape:collect="always" xlink:href="#linearGradient5327" id="radialGradient5335" cx="97.510902" cy="177.18147" fx="97.510902" fy="177.18147" r="83.359283" gradientTransform="matrix(1,0,0,0.31868267,0,120.71681)" gradientUnits="userSpaceOnUse" />
   </svg:defs>
-  <sodipodi:namedview id="base" pagecolor="#ffffff" bordercolor="#666666" borderopacity="1.0" inkscape:pageopacity="0.0" inkscape:pageshadow="2" inkscape:zoom="1.0924479" inkscape:cx="281.662" inkscape:cy="37.331858" inkscape:current-layer="top_left " inkscape:document-units="px" showgrid="false" inkscape:window-width="1680" inkscape:window-height="1038" inkscape:window-x="0" inkscape:window-y="0" inkscape:window-maximized="1" />
+  <sodipodi:namedview id="base" pagecolor="#ffffff" bordercolor="#666666" borderopacity="1.0" inkscape:pageopacity="0.0" inkscape:pageshadow="2" inkscape:zoom="1.0924479" inkscape:cx="533.02825" inkscape:cy="366.86702" inkscape:current-layer="top_left " inkscape:document-units="px" showgrid="false" inkscape:window-width="1680" inkscape:window-height="1038" inkscape:window-x="0" inkscape:window-y="0" inkscape:window-maximized="1" />
   <svg:metadata id="metadata2990">
     <rdf:RDF>
       <cc:Work rdf:about="">
         <dc:format>image/svg+xml</dc:format>
         <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </svg:metadata>
@@ -45,8 +45,12 @@
       <svg:rect data-bind="attr: { width: energyRatio() * 449 }" ry="2.3711846" y="193" x="81.5" height="11" width="449" id="rect2993" style="opacity:0.65;fill:#000080;fill-opacity:1;fill-rule:nonzero;stroke:none" />
     </svg:g>
     <text x="100" y="100">Hello</text>
-    <svg:text id="text3816" x="1130.2087" y="195.12671" style="font-size:29.4695034px;font-weight:normal;text-anchor:end;fill:#ff0000;font-family:'Arial,sans-serif'" transform="scale(0.97903869,1.0214101)" data-bind="text: score">Hello333</svg:text>
-    <svg:text id="text3816-6" x="330.56717" y="250.07677" style="font-size:131.3916626px;font-weight:normal;text-anchor:end;opacity:0.25252524;fill:#ff0000;stroke:none;font-family:'Arial,sans-serif'" transform="scale(1.0182879,0.98204049)" data-bind="text: countdown">00:60</svg:text>
+    <svg:text id="text3816" x="1130.2087" y="195.12671" style="font-size:29.4695034px;font-weight:normal;text-anchor:end;fill:#ff0000;font-family:SciFly, Arial, sans-serif" transform="scale(0.97903869,1.0214101)" data-bind="text: score">
+      <svg:tspan style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:SciFly;-inkscape-font-specification:SciFly" id="tspan3484">Hello333</svg:tspan>
+    </svg:text>
+    <svg:text id="text3816-6" x="330.56717" y="250.07677" style="font-size:131.3916626px;font-weight:normal;text-anchor:end;opacity:0.25252524;fill:#ff0000;stroke:none;font-family:SciFly, Arial, sans-serif" transform="scale(1.0182879,0.98204049)" data-bind="text: countdown">
+      <svg:tspan style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:SciFly;-inkscape-font-specification:SciFly" id="tspan3482">00:60</svg:tspan>
+    </svg:text>
     <svg:flowRoot xml:space="preserve" id="flowRoot3014" style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"><svg:flowRegion id="flowRegion3016"><svg:rect id="rect3018" width="13.730632" height="10.06913" x="180.32896" y="35.699631" /></svg:flowRegion><svg:flowPara id="flowPara3020" /></svg:flowRoot>    <svg:text xml:space="preserve" style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial" x="42.107269" y="703.92371" id="text3024" sodipodi:linespacing="125%"><svg:tspan sodipodi:role="line" id="tspan3026" x="42.107269" y="703.92371" /></svg:text>
     <svg:g id="g3979" style="opacity:0.08">
       <svg:g id="g3985">
