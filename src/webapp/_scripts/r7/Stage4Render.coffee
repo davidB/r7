@@ -4,8 +4,8 @@ define(
     (container, context) ->
 
       _scene = new THREE.Scene()
+      _devMode = false
       _areaBox = null
-      _cube = null
       _cameraTargetObjId = null
       #_camera = new THREE.PerspectiveCamera(75, 1, 1, 500)
       _camera = new THREE.OrthographicCamera(10,10,10,10, 1, 1000)
@@ -102,10 +102,12 @@ define(
       #
       self.onEvent = (e, out) ->
         switch e.k
-
-          #TODO initialize/reset
+          when 'DevMode'
+            _devMode = true
           when "Start"
-            out.push(start())
+            #TODO initialize/reset
+            e1 = start()
+            out.push(e1) if e1?
           when "Render"
             render()
           when "SetLocalDroneId"
@@ -123,18 +125,21 @@ define(
             # pass
       start = ->
         addLights(_scene, _camera)
-        evt.SetupDatGui((gui) ->
-          f2 = gui.addFolder("Camera")
-          f2.add(_camera, "gameDriven")
-          f2.add(_camera.position, "x").listen()
-          f2.add(_camera.position, "y").listen()
-          f2.add(_camera.position, "z").listen()
-          f2.add(_camera, "fov").listen() if _camera.fov?
-          f2.add(_camera, "inPerspectiveMode").onFinishChange((value) ->
-            updateViewportSize()
-          ) if _camera.inPerspectiveMode?
-          gui.remember(_camera)
-        )
+        if (_devMode)
+          evt.SetupDatGui((gui) ->
+            f2 = gui.addFolder("Camera")
+            f2.add(_camera, "gameDriven")
+            f2.add(_camera.position, "x").listen()
+            f2.add(_camera.position, "y").listen()
+            f2.add(_camera.position, "z").listen()
+            f2.add(_camera, "fov").listen() if _camera.fov?
+            f2.add(_camera, "inPerspectiveMode").onFinishChange((value) ->
+              updateViewportSize()
+            ) if _camera.inPerspectiveMode?
+            gui.remember(_camera)
+          )
+        else
+          null
 
         #_controls = new THREE.FirstPersonControls( _camera, container )
         #_controls.movementSpeed = 10
@@ -194,7 +199,7 @@ define(
         light.shadowCameraFar = camera.far
         light.shadowCameraFov = 50
 
-        light.shadowCameraVisible = true
+        light.shadowCameraVisible = _devMode
 
         light.shadowBias = 0.0001
         light.shadowDarkness = 0.5
@@ -262,7 +267,6 @@ define(
         if obj?
           anim = obj.anims.despawn
           if anim?
-            console.log("anim", obj)
             anim(obj, ((obj)-> _scene.remove(obj)), options)
           else
             _scene.remove(obj)
@@ -403,10 +407,6 @@ define(
           obj.position.x = pos.x
           obj.position.y = pos.y
           obj.rotation.z = pos.a
-
-      spawnCube = (w)->
-        _cube = Cube(w / 50)
-        _scene.add(_cube)
 
 
       #

@@ -22,7 +22,9 @@ define('main', [
     'r7/Ring',
     'r7/evt',
     'r7/timer',
+    'r7/Stage4DevMode',
     'r7/Stage4LogEvent',
+    'r7/Stage4DatGui',
     'ui',
     'rules',
     'console'
@@ -30,25 +32,36 @@ define('main', [
   Ring,
   evt,
   timer,
+  Stage4DevMode,
   Stage4LogEvent,
+  Stage4DatGui,
   ui,
   rules,
   console
 ) {
 
   return function(){
+    var devMode = document.location.href.indexOf('dev=true') > -1;
+
     var container = window.document.getElementById('layers');
-    var ring = Ring([
-      Stage4LogEvent(['Init', 'SpawnObj', 'DespawnObj', 'BeginContact', 'Start', 'Stop']).onEvent,
+    var stages = [
+      rules.onEvent,
       ui(container).onEvent,
-      rules.onEvent
-    ]);
+    ];
+
+    if (devMode) {
+      stages.push(Stage4DevMode().onEvent);
+      stages.push(Stage4LogEvent(['Init', 'SpawnObj', 'DespawnObj', 'BeginContact', 'Start', 'Stop']).onEvent);
+      stages.push(Stage4DatGui().onEvent);
+    }
+
+    var ring = Ring(stages);
 
     ring.push(evt.Init);
     //ring.push(evt.Start); //TODO push Start when ready and user hit star button
     var lastDelta500 = -1;
     var loop = function() {
-      // loop on r<F10>equest animation loop
+      // loop on request animation loop
       // - it has to be at the beginning of the function
       // - @see http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
       //RequestAnimationFrame.request(loop);

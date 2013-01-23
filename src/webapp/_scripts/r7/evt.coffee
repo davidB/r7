@@ -8,7 +8,9 @@ define([], ()->
     Init: {
       k: "Init"
     }
-
+    DevMode : {
+      k: 'DevMode'
+    }
     Start: {
       k: "Start"
     }

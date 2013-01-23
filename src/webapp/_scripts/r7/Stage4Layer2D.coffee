@@ -26,8 +26,6 @@ define(["r7/evt", "ko"], (evt, ko) ->
         when "SetLocalDroneId"
           _shipIdP = e.objId + "/"
         when "UpdateVal"
-          if e.key.indexOf("/score") > -1
-            console.log(e)
           if e.key.indexOf(_shipIdP) is 0
             fieldName = e.key.substring(_shipIdP.length)
             field = _viewModel[fieldName]
