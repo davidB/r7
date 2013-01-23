@@ -12,11 +12,17 @@ define([], ()->
     Start: {
       k: "Start"
     }
-    Tick: (t, delta500) -> {
+    _lastTick : {
       k: "Tick"
-      t: t
-      delta500: (if (delta500 is 0) then 0 else (delta500 or null))
+      t: -1
+      delta500: 0
     }
+    Tick: (t, delta500) ->
+      #reuse _lastTick (only one is available in the system) (OPTIM GC)
+      e = evt._lastTick
+      e.t = t
+      e.delta500 = (if (delta500 is 0) then 0 else (delta500 or null))
+      e
     Render: {
       k: "Render"
     }
@@ -85,15 +91,17 @@ define([], ()->
       k: "FireBullet"
       emitterId: emitterId
     }
-    SpawnObj: (objId, pos, gpof) -> {
+    SpawnObj: (objId, pos, gpof, options) -> {
       k: "SpawnObj"
       objId: objId
       pos: pos
       gpof: gpof
+      options: options
     }
-    DespawnObj: (objId) -> {
+    DespawnObj: (objId, options) -> {
       k: "DespawnObj"
       objId: objId
+      options: options
     }
     MoveObjTo: (objId, pos, acc) -> {
       k: "MoveObjTo"
