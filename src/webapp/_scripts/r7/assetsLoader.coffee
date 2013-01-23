@@ -63,15 +63,16 @@ define(["console", "THREE", "chipmunk", "underscore", 'preloadjs', 'Q', 'r7/Stag
     anims : {}
   }
 
-  cube_rotate = (obj3d, onComplete, noStart) ->
+  cube_rotate = (obj3d, onComplete, options) ->
     a = {
       update : (t) ->
         obj3d.rotation.x += 0.01
         obj3d.rotation.y += 0.02
       start : (t) -> TWEEN.add(a)
     }
-    a.start() if !noStart
+    a.start() if ! (options?.noStart?)
     a
+  none = (obj3d, onComplete, options) -> onComplete(obj3d) if onComplete?
 
   _targetg102 = {
     obj2dF : () ->
@@ -85,11 +86,22 @@ define(["console", "THREE", "chipmunk", "underscore", 'preloadjs', 'Q', 'r7/Stag
       s = 1
       geometry = new THREE.CubeGeometry(s, s, s)
       material = new THREE.MeshNormalMaterial()
-      new THREE.Mesh(geometry, material)
+      o = new THREE.Mesh(geometry, material)
+      o.position.z = 1
+      o
     anims: {
-      spawn: (obj3d, onComplete) -> animations.scaleIn(obj3d, onComplete).chain(_targetg102.anims.waiting(obj3d, null, true))
-      despawn: animations.scaleOut
+      spawn: (obj3d, onComplete, options) ->
+        animations.scaleIn(obj3d, onComplete, options).
+          chain(_targetg102.anims.waiting(obj3d, null, {noStart : true}))
+      despawn: (obj3d, onComplete, options) ->
+        if (options?.animName?)
+          a = options.animName
+          delete options.animName
+          _targetg102.anims[a].apply(this, arguments)
+        else
+          animations.scaleOut(obj3d, onComplete, options)
       waiting: cube_rotate
+      none: none
     }
   }
 

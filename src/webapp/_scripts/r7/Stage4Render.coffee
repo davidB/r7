@@ -114,11 +114,11 @@ define(
             spawnObj(e.objId, e.pos, e.gpof)
             #spawnScene(e.objId, e.pos, e.scene3d)
           when "SpawnObj"
-            spawnObj(e.objId, e.pos, e.gpof)
+            spawnObj(e.objId, e.pos, e.gpof, e.options)
           when "MoveObjTo"
             moveObjTo(e.objId, e.pos)
           when "DespawnObj"
-            despawnObj(e.objId, e.anim)
+            despawnObj(e.objId, e.options)
           else
             # pass
       start = ->
@@ -227,7 +227,7 @@ define(
         lights
 
       #TODO support spawn animation
-      spawnObj = (id, pos, gpof) ->
+      spawnObj = (id, pos, gpof, options) ->
         return if !(gpof? && gpof.obj3dF?)
         ids = id.split('>')
         parent = _scene
@@ -246,7 +246,7 @@ define(
 
   #console.trace();
           return
-        obj = gpof.obj3dF()
+        obj = gpof.obj3dF(options)
         obj.name = name
         obj.position.x = pos.x
         obj.position.y = pos.y
@@ -254,16 +254,16 @@ define(
         obj.rotation.z = pos.a
         parent.add(obj)
         obj.anims = gpof.anims #clone ?
-        obj.anims.spawn?(obj)
+        obj.anims.spawn?(obj, null, options)
 
       #TODO support despawn animation
-      despawnObj = (id) ->
+      despawnObj = (id, options) ->
         obj = _scene.getChildByName(id, false)
         if obj?
           anim = obj.anims.despawn
           if anim?
             console.log("anim", obj)
-            anim(obj, (obj)-> _scene.remove(obj))
+            anim(obj, ((obj)-> _scene.remove(obj)), options)
           else
             _scene.remove(obj)
 

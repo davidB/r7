@@ -57,14 +57,14 @@ define(["r7/evt", "r7/Position", "r7/assetsLoader", "r7/Stage4Animation"], (evt,
     onHit = (shipId, targetG1Id) ->
       onAutoEvent(evt.StopCountdown(targetG1Id + "/countdown"))
       onAutoEvent(evt.ReqEvt(evt.IncVal(shipId + "/score", _value)))
-      onAutoEvent(evt.DespawnObj(targetG1Id))
+      onAutoEvent(evt.DespawnObj(targetG1Id, {animName : "none"}))
       _value += 1
       console.log("value", _value)
       #onAutoEvent(evt.UpdateVal(targetG1Id + "/value", _value))
       spawnNewTargetG1(1)
 
     onTimeout = (objId) ->
-      onAutoEvent(evt.DespawnObj(objId, animations.scaleOut))
+      onAutoEvent(evt.DespawnObj(objId))
       _value = Math.max(1, _value - 10)
       #onAutoEvent(evt.UpdateVal(objId + "/value", _value))
       spawnNewTargetG1(1)
