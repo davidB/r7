@@ -22,8 +22,7 @@ define(["r7/evt", "r7/Position", "r7/assetsLoader", "underscore", "Q"], (evt, Po
             (x) -> assetsLoader.preload(x.id, x.kind)
           )
           Q.all(assets).then((x) ->
-            _pending.push(evt.Start)
-            start()
+            _pending.push(evt.Initialized)
           )
         when "Start"
           start()

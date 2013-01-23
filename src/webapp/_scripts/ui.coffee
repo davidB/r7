@@ -5,6 +5,7 @@ define(
       Stage4UserInput().onEvent,
       Stage4Animation().onEvent,
       Stage4Render(container).onEvent,
-      Stage4Layer2D(window.document.getElementById('layer2D')).onEvent
+      #Stage4Layer2D(window.document.getElementById('layer2D')).onEvent
+      Stage4Layer2D(container).onEvent
     ])
 )

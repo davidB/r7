@@ -1,5 +1,13 @@
 define(["r7/evt", "ko"], (evt, ko) ->
-  ViewModel = () ->
+
+  showScreen = (id) ->
+    screens = document.getElementsByClassName('screen_info')
+    for screen in screens
+      #screen.style.opacity = (screen.id === id)?1 : 0;
+      screen.style.display = if (screen.id == id) then 'block' else 'none'
+    false
+
+  ViewModel = (pending) ->
     @score = ko.observable(0)
     @energy = ko.observable(50)
     @energyMax = ko.observable(100)
@@ -7,6 +15,11 @@ define(["r7/evt", "ko"], (evt, ko) ->
     @countdown = ko.observable("00:60")
     @shieldActive = ko.observable(false)
     @fireActive = ko.observable(false)
+    @initialized =ko.observable(false)
+    @start = () ->
+      console.log("START")
+      pending.push(evt.Start)
+      showScreen('none')
     this
 
   ###
@@ -14,14 +27,21 @@ define(["r7/evt", "ko"], (evt, ko) ->
   ###
   (container) ->
     self = {}
+    _pending = []
     _shipIdP = "!"
-    _viewModel = new ViewModel()
+    _viewModel = new ViewModel(_pending)
+
     self.onEvent = (e, out) ->
       switch e.k
         when "Init"
+          showScreen('screenInit')
           ko.applyBindings(_viewModel, container)
+          _viewModel.initialized(false)
+        when "Initialized"
+          _viewModel.initialized(true)
+          console.log("dummy")
         when "SpawnHud"
-          container.appendChild(e.domElem) if e.domElem?
+          document.getElementById("hud").appendChild(e.domElem) if e.domElem?
           ko.applyBindings(_viewModel, container)
         when "SetLocalDroneId"
           _shipIdP = e.objId + "/"
@@ -42,5 +62,6 @@ define(["r7/evt", "ko"], (evt, ko) ->
             _viewModel.countdown(result)
         else
           # pass
+      evt.moveInto(_pending, out)
     self
 )

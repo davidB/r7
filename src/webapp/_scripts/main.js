@@ -51,7 +51,7 @@ define('main', [
 
     if (devMode) {
       stages.push(Stage4DevMode().onEvent);
-      stages.push(Stage4LogEvent(['Init', 'SpawnObj', 'DespawnObj', 'BeginContact', 'Start', 'Stop']).onEvent);
+      stages.push(Stage4LogEvent(['Init', 'SpawnObj', 'DespawnObj', 'BeginContact', 'Start', 'Stop', 'Initialized']).onEvent);
       stages.push(Stage4DatGui().onEvent);
     }
 
