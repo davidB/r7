@@ -117,9 +117,11 @@
     .screen_inner h3 {
       text-align: center;
     }
+    .screen_inner div, .screen_inner table {
+      margin: auto;
+    }
     .screen_inner .actions {
       text-align: center;
-      margin: auto;
     }
     .btn {
       -webkit-transition: all 1s;
@@ -186,6 +188,22 @@
         <div id="screen1" class="screen_info">
           <div class="screen_inner">
             <h3>Welcome VDroner,</h3>
+            <div id="controls_help" style="padding-bottom:3em">
+              <table>
+                <tr>
+                  <td>Forward</td>
+                  <td>[up] [W]</td>
+                </tr>
+                <tr>
+                  <td>Rotate Right</td>
+                  <td>[right] [A]</td>
+                </tr>
+                <tr>
+                  <td>Rotate Left</td>
+                  <td>[left] [D]</td>
+                </tr>
+              </table>
+            </div>
             <div class="actions">
               <p>Please wait, connecting to VSpace ...</p>
               <!--button class="btn" onclick="showScreen('screen2');" disabled="disabled">START</button-->

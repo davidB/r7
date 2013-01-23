@@ -26,6 +26,7 @@ require.config({
       '../_vendors/jquery-1.7.1/jquery-1.7.1.min'
     ],
     'bootstrap' : '../_vendors/bootstrap/js/bootstrap.min',
+    'Mousetrap' : '../_vendors/mousetrap.min',
     'preloadjs' : [
       'http://code.createjs.com/preloadjs-0.2.0.min',
       '../_vendors/preloadjs-0.2.0/preloadjs-0.2.0.min'
@@ -56,6 +57,7 @@ require.config({
     'chipmunk' :      { deps: [], exports: 'cp' },
     'preloadjs':      { deps: [], exports: 'createjs.PreloadJS'},
     'Q':              { deps: [], exports: 'Q'},
+    'Mousetrap':      { deps: [], exports: 'Mousetrap'},
     'jasmine' :       { deps: [], exports: 'jasmine'},
     'jasmine-html' :  { deps: ['jasmine'], exports: 'jasmine.TrivialReporter'}
   },
