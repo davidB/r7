@@ -53,6 +53,7 @@ define('main', [
       // - @see http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
       //RequestAnimationFrame.request(loop);
       // note: three.js includes requestAnimationFrame shim
+      //setTimeout(function() { requestAnimationFrame(loop); }, 1000/30);
       requestAnimationFrame(loop);
       var t = new Date().getTime();
       var delta500 = null;
