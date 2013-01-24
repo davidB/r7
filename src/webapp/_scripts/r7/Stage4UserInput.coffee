@@ -4,14 +4,14 @@ define(["r7/evt", "Mousetrap"], (evt, Mousetrap) ->
   _pending = []
 
   _keys = [{
-    codes: [ 'up', 'w' ]
+    codes: [ 'up', 'w', 'z' ]
     label: 'Forward'
     active : false
     start: () -> evt.ReqEvt(evt.BoostShipStart(_shipId))
     stop: ()-> evt.ReqEvt(evt.BoostShipStop(_shipId))
   },
   {
-    codes: [ 'left', 'a']
+    codes: [ 'left', 'a', 'q']
     label: 'Rotate Left'
     active : false
     start: -> evt.ReqEvt( evt.RotateShipStart(_shipId, 0.5))
