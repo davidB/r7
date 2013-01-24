@@ -24,14 +24,14 @@ define(["console", "THREE", "chipmunk", "underscore", 'preloadjs', 'Q', 'r7/Stag
   }
 
   _area02 = {
-    width : 16 #nbcell
-    height : 9 #nbcell
+    width : 10 #nbcell
+    height :10 #nbcell
     cellr : 10
     walls : {
-      cells : [1,2,0,4] #cellunit [x0,y0,w0,h0, x1,y1,....]
+      cells : [1,5,3,0, 6,5,3,0, 5,1,0,3, 5,6,0,3] #cellunit [x0,y0,w0,h0, x1,y1,....]
     }
     zones : [
-      { k : "targetg1/spawn", cells : [0,0,1,1, 3,4,1,1] }
+      { k : "targetg1/spawn", cells : [0,0,9,9] }
       { k : "gate/in",    cells : [3,3,1,1] }
     ]
   }
