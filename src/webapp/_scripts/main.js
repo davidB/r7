@@ -19,7 +19,6 @@ define('r7/timer', [], function(){
 });
 
 define('main', [
-    'r7/Ring',
     'r7/evt',
     'r7/timer',
     'r7/Stage4DevMode',
@@ -29,7 +28,6 @@ define('main', [
     'rules',
     'console'
 ], function(
-  Ring,
   evt,
   timer,
   Stage4DevMode,
@@ -44,20 +42,17 @@ define('main', [
     var devMode = document.location.href.indexOf('dev=true') > -1;
 
     var container = window.document.getElementById('layers');
-    var stages = [
-      rules.onEvent,
-      ui(container).onEvent,
-    ];
 
+    rules(evt);
+    ui(evt, container);
     if (devMode) {
-      stages.push(Stage4DevMode().onEvent);
-      stages.push(Stage4LogEvent(['Init', 'SpawnObj', 'DespawnObj', 'BeginContact', 'Start', 'Stop', 'Initialized']).onEvent);
-      stages.push(Stage4DatGui().onEvent);
+      Stage4DevMode(evt);
+      Stage4LogEvent(evt, ['Init', 'SpawnObj', 'DespawnObj', 'BeginContact', 'Start', 'Stop', 'Initialized']);
+      Stage4DatGui(evt);
     }
 
-    var ring = Ring(stages);
 
-    ring.push(evt.Init);
+    evt.GameInit.dispatch();
     //ring.push(evt.Start); //TODO push Start when ready and user hit star button
     var lastDelta500 = -1;
     var loop = function() {
@@ -79,7 +74,7 @@ define('main', [
         lastDelta500 = t;
         delta500 = d;
       }
-      ring.push(evt.Tick(t, delta500));
+      evt.Tick.dispatch(t, delta500);
     };
 
     loop();

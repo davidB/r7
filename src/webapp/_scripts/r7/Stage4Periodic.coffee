@@ -1,25 +1,12 @@
-define(["r7/evt"], (evt) ->
+define([], () ->
 
   ###
   ###
-  ()->
-    self = {}
-    _pending = []
+  (evt)->
     _tasks = []
-    self.onEvent = (e, out) ->
-      switch e.k
-        when "RegisterPeriodicEvt"
-          registerPeriodic(e)
-        when "UnRegisterPeriodicEvt"
-          unregisterPeriodic(e.id)
-        when "Tick"
-          ping(e.t)
-        else
-          # pass
-      evt.moveInto(_pending, out)
 
-    registerPeriodic = (e) ->
-      e.runAt = 0
+    registerPeriodic = (id, interval, signal, args) ->
+      e = {id: id, interval: interval, runAt: 0, signal: signal, args: args}
       _tasks.push(e)
 
     unregisterPeriodic = (id) ->
@@ -30,9 +17,12 @@ define(["r7/evt"], (evt) ->
     ping = (t) ->
       _tasks.forEach((task) ->
         if task.runAt < t
-          _pending.push(task.evt)
+          task.signal.dispatch.apply(this, task.args)
           task.runAt = t + task.interval
       )
 
-    self
+    evt.PeriodicEvtAdd.add(registerPeriodic)
+    evt.PeriodicEvtDel.add(unregisterPeriodic)
+    evt.Tick.add(ping)
+    null
 )

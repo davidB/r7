@@ -1,4 +1,4 @@
-define(["r7/evt", "r7/Position", "r7/assetsLoader", "r7/Stage4Animation"], (evt, Position, assetsLoader, animations) ->
+define(["signals", "r7/Position", "r7/assetsLoader", "r7/Stage4Animation"], (signals, Position, assetsLoader, animations) ->
 
   ###
   @param {number} min
@@ -18,53 +18,30 @@ define(["r7/evt", "r7/Position", "r7/assetsLoader", "r7/Stage4Animation"], (evt,
 
     Position(pos0.x + d0 * Math.cos(a), pos0.y + d0 * Math.sin(a), pos0.a)
 
-  ->
-    self = {}
+  (evt) ->
     _value = 1 #getter for display
     _targetG1IdPrefix = "target-g1/"
-    _pending = []
     _pos0 = Position.zero
-    _onEventWaiting = (e, out) ->
-      switch e.k
-        when "Start"
-          self._onEvent = _onEventRunning
-          spawnNewTargetG1(1)
-      evt.moveInto(_pending, out)
 
-    _onEventRunning = (e, out) ->
-      switch e.k
-        when "Stop"
-          self._onEvent = _onEventWaiting
-        when "TargetG1.Timeout"
-          onTimeout(e.objId)
-        when "BeginContact"
-          onHit(e.objId0, e.objId1) if e.objId0.indexOf("ship/") is 0 and e.objId1.indexOf(_targetG1IdPrefix) is 0
-        else
-          #pass
-      evt.moveInto(_pending, out)
 
-    self._onEvent = _onEventWaiting
-    self.onEvent = (e, out) -> self._onEvent(e, out)
 
-    n = 0
-    newTargetG1Id = () -> _targetG1IdPrefix + (n++)#(new Date().getTime())
+    newTargetG1Id = () -> _targetG1IdPrefix + (newTargetG1Id.n++)#(new Date().getTime())
+    newTargetG1Id.n = 0
 
-    onAutoEvent = (e) ->
-      if e isnt null
-        _pending.push(e)
-        self.onEvent(e, _pending)
-
-    onHit = (shipId, targetG1Id) ->
-      onAutoEvent(evt.StopCountdown(targetG1Id + "/countdown"))
-      onAutoEvent(evt.ReqEvt(evt.IncVal(shipId + "/score", _value)))
-      onAutoEvent(evt.DespawnObj(targetG1Id, {animName : "none"}))
+    onHit = (objId0, objId1) ->
+      return if objId0.indexOf("ship/") != 0 and objId1.indexOf(_targetG1IdPrefix) != 0
+      shipId = objId0
+      targetG1Id = objId1
+      evt.CountdownStop.dispatch(targetG1Id + "/countdown")
+      evt.EvtReq.dispatch(evt.ValInc, [shipId + "/score", _value])
+      evt.ObjDespawn.dispatch(targetG1Id, {animName : "none"})
       _value += 1
       console.log("value", _value)
       #onAutoEvent(evt.UpdateVal(targetG1Id + "/value", _value))
       spawnNewTargetG1(1)
 
     onTimeout = (objId) ->
-      onAutoEvent(evt.DespawnObj(objId))
+      evt.ObjDespawn.dispatch(objId)
       _value = Math.max(1, _value - 10)
       #onAutoEvent(evt.UpdateVal(objId + "/value", _value))
       spawnNewTargetG1(1)
@@ -73,11 +50,15 @@ define(["r7/evt", "r7/Position", "r7/assetsLoader", "r7/Stage4Animation"], (evt,
       nextPos = nextPosition(Position.zero, 10)
       objId = newTargetG1Id()
       assetsLoader.find('targetg101').then((x) ->
-        onAutoEvent(evt.StartCountdown(objId + "/spawn", toffset, evt.SpawnObj(objId, nextPos, x)))
-        onAutoEvent(evt.StartCountdown(objId + "/countdown", 10 + toffset, {k: "TargetG1.Timeout", objId : objId}))
+        evt.CountdownStart.dispatch(objId + "/spawn", toffset, evt.ObjSpawn, [objId, nextPos, x])
+        evt.CountdownStart.dispatch(objId + "/countdown", 10 + toffset, TimeOut, [objId])
       ).done()
 
-    self
+    TimeOut = new signals.Signal()
+    TimeOut.add(onTimeout)
+    evt.GameStart.add(() -> spawnNewTargetG1(1))
+    evt.GameStop.add(() -> console.log("TODO"))
+    evt.ContactBegin.add(onHit)
 
 )
 #TODO time countdown

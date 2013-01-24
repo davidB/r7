@@ -1,34 +1,27 @@
-define(["r7/evt"], (evt) ->
-  () ->
-    self = {}
+define([], () ->
+  (evt) ->
     _tasks = {}
-    _states = evt.newStates()
-    onUpdateState = (out, k, v) ->
-      if v is 0
-        t = _tasks[k]
-        if t?
-          out.push(_tasks[k].timeoutEvt)  if _tasks[k].timeoutEvt isnt null
-          delete _tasks[k]
 
-          delete _states[k]
-
-    decCountdown = (out, delta) ->
+    decCountdown = (t, delta500) ->
+      return if delta500 <= 0
+      delta = (delta500 / 2)
       for key of _tasks
-        v = _states[key]
+        t = _tasks[key]
+        v = t.timeout
         v = Math.max(0, v - delta)
-        _states.update(out, key, v, onUpdateState)
-
-    self.onEvent = (e, out) ->
-      switch e.k
-        when "StartCountdown"
-          _tasks[e.key] = e
-          _states.update(out, e.key, e.timeout, onUpdateState)
-        when "StopCountdown"
-          delete _tasks[e.key]
-          delete _states[e.key]
-        when "Tick"
-          decCountdown(out, e.delta500 / 2)  if e.delta500 > 0
+        if v == 0
+          delete _tasks[key]
+          t.signal.dispatch.apply(this, t.args)
         else
-          # pass
-    self
+          t.timeout = v
+          evt.ValUpdate.dispatch(key, v)
+
+    evt.CountdownStart.add((key, timeout, signal, args) ->
+      _tasks[key] = {timeout: timeout, signal: signal, args: args}
+    )
+    evt.CountdownStop.add((key) ->
+      delete _tasks[key]
+    )
+    evt.Tick.add(decCountdown)
+    null
 )

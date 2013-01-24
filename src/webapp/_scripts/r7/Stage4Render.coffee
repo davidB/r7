@@ -1,7 +1,7 @@
 define(
-  ['THREE', 'console', 'r7/evt', 'webglDetector', 'underscore', 'r7/cameraMode2D'],
-  (THREE, console, evt, webglDetector, _, cameraConstraint) ->
-    (container, context) ->
+  ['THREE', 'console', 'webglDetector', 'underscore', 'r7/cameraMode2D'],
+  (THREE, console, webglDetector, _, cameraConstraint) ->
+    (evt, container, context) ->
 
       _scene = new THREE.Scene()
       _devMode = false
@@ -100,33 +100,11 @@ define(
       #pointLight.position.set( 5, 0, 0 );
       #_scene.add( pointLight );
       #
-      self.onEvent = (e, out) ->
-        switch e.k
-          when 'DevMode'
-            _devMode = true
-          when "Start"
-            #TODO initialize/reset
-            e1 = start()
-            out.push(e1) if e1?
-          when "Render"
-            render()
-          when "SetLocalDroneId"
-            _cameraTargetObjId = e.objId
-          when "SpawnArea"
-            spawnObj(e.objId, e.pos, e.gpof)
-            #spawnScene(e.objId, e.pos, e.scene3d)
-          when "SpawnObj"
-            spawnObj(e.objId, e.pos, e.gpof, e.options)
-          when "MoveObjTo"
-            moveObjTo(e.objId, e.pos)
-          when "DespawnObj"
-            despawnObj(e.objId, e.options)
-          else
-            # pass
+
       start = ->
         addLights(_scene, _camera)
         if (_devMode)
-          evt.SetupDatGui((gui) ->
+          evt.SetupDatGui.dispatch((gui) ->
             f2 = gui.addFolder("Camera")
             f2.add(_camera, "gameDriven")
             f2.add(_camera.position, "x").listen()
@@ -469,5 +447,17 @@ define(
       #      _scene.add(obj);
       #    };
       #
-      self
+      evt.DevMode.add(()->
+        _devMode = true
+      )
+      evt.GameStart.add(start)
+      evt.Render.add(render)
+      evt.SetLocalDroneId.add((objId) ->
+        _cameraTargetObjId = objId
+      )
+      evt.AreaSpawn.add(spawnObj)
+      evt.ObjSpawn.add(spawnObj)
+      evt.ObjMoveTo.add(moveObjTo)
+      evt.ObjDespawn.add(despawnObj)
+      null
 )

@@ -20,6 +20,7 @@ require.config({
     'Box2D' : '../_vendors/box2dweb-2.1alpha/Box2D.min',
     'chipmunk' : '../_vendors/chipmunk/cp',
     'd3' : '../_vendors/d3.v2.min',
+    'signals' : '../_vendors/signals-1.0.0/signals.min',
     'jquery' : [
       'http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min',
       //LOAD FROM THIS LOCATION IF THE CDN LOCATION FAILS

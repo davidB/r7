@@ -1,4 +1,4 @@
-define(["r7/evt", "console", "chipmunk", "r7/Vec3F", "r7/Position", "underscore", "THREE", "r7/assetsLoader"], (evt, console, cp, Vec3F, Position, _, THREE, assetsLoader) ->
+define(["console", "chipmunk", "r7/Vec3F", "r7/Position", "underscore", "THREE", "r7/assetsLoader"], (console, cp, Vec3F, Position, _, THREE, assetsLoader) ->
 
   # shortcut, alias
   _degToRad = 0.0174532925199432957
@@ -19,51 +19,10 @@ define(["r7/evt", "console", "chipmunk", "r7/Vec3F", "r7/Position", "underscore"
     boost: boost
   }
 
-  ->
-    self = {}
+  (evt) ->
     _space = null
     _lastTimestamp = 0
-    _pending = []
     _running = false
-    self.onEvent = onEvent = (e, out) ->
-      switch e.k
-        when "Init"
-          _space= initSpace()
-          _pending = []
-        when "Start"
-          _running = true
-        when "Stop"
-          _running = false
-        when "SpawnArea"
-          spawnArea(e.objId, e.gpof)
-        when "BoostShipStart"
-          setBoost(e.objId, 0.3)
-        when "BoostShipStop"
-          setBoost(e.objId, 0)
-        when "RotateShipStart"
-          setRotation(e.objId, e.angleSpeed)
-        when "RotateShipStop"
-          setRotation(e.objId, 0)
-        when "RequestDirectShip"
-          setAngle(e.objId, Math.atan(e.acc.y / e.acc.x)) #TODO case div by zero
-          setBoost( e.objId, Math.sqrt(e.acc.y * e.acc.y + e.acc.x * e.acc.x))
-        when "FireBullet"
-          out.push(spawnBullet(e.emitterId))
-        when "ImpulseObj"
-          impulseObj(e.objId, e.angle, e.force)
-        when "SpawnObj"
-          spawnObj(e.objId, e.pos, e.gpof)
-        when "DespawnObj"
-          despawn(e.objId)
-        when "Tick"
-          if _running
-            update(e.t)
-            pushStates(out)
-            out.push(evt.Render) # if out.length > 0
-        else
-
-      #pass
-      evt.moveInto(_pending, out)
 
 
     initSpace = ()->
@@ -74,41 +33,22 @@ define(["r7/evt", "console", "chipmunk", "r7/Vec3F", "r7/Position", "underscore"
 
       begin = (arb, space) ->
         shapes = arb.getShapes()
-        _pending.push(evt.BeginContact(shapes[0].body.data.id, shapes[1].body.data.id))
+        evt.ContactBegin.dispatch(shapes[0].body.data.id, shapes[1].body.data.id)
         false
 
       space.addCollisionHandler(assetsLoader.types.drone, assetsLoader.types.item, begin, undefined, undefined, undefined)
-      #listener = new Box2D.Dynamics.b2ContactListener()
-      #listener.BeginContact = (contact) ->
-      #  objId0 = contact.GetFixtureA().GetBody().GetUserData().id
-      #  objId1 = contact.GetFixtureB().GetBody().GetUserData().id
-      #  if !!objId0 and !!objId1 and objId0 isnt objId1
-      #    if objId0 < objId1
-      #      _pending.push evt.BeginContact(objId0, objId1)
-      #    else
-      #      _pending.push evt.BeginContact(objId1, objId0)
-      #
-      #listener.EndContact = (contact) ->
-      #  objId0 = contact.GetFixtureA().GetBody().GetUserData().id
-      #  objId1 = contact.GetFixtureB().GetBody().GetUserData().id
-      #  if !!objId0 and !!objId1 and objId0 isnt objId1
-      #    if objId0 < objId1
-      #      _pending.push evt.EndContact(objId0, objId1)
-      #    else
-      #      _pending.push evt.EndContact(objId1, objId0)
-      #
-      #listener.PostSolve = (contact, impulse) ->
-      #
-      #listener.PreSolve = (contact, oldManifold) ->
-      #_world.SetContactListener listener
       space
 
     despawn = (id) ->
       forBody(id, (b, u) ->
-        _space.removeShape(shape) for shape in b.shapeList when shape?
-        _space.removeBody(b)
-        delete _id2body[id]
-        #_id2body[id] = null
+        f = () ->
+          _space.removeShape(shape) for shape in b.shapeList when shape?
+          _space.removeBody(b)
+          delete _id2body[id]
+        if _space.isLocked
+          _space.addPostStepCallback(f)
+        else
+          f()
       )
 
     update = (t) ->
@@ -134,8 +74,9 @@ define(["r7/evt", "console", "chipmunk", "r7/Vec3F", "r7/Position", "underscore"
       _space.step(stepRate)
       _lastTimestamp = t
 
-    pushStates = (out) ->
+    pushStates = () ->
       #space.eachShape((shape) ->
+      ct = 0
       _space.lock()
       try
         _space.activeShapes.each((shape) ->
@@ -144,10 +85,12 @@ define(["r7/evt", "console", "chipmunk", "r7/Vec3F", "r7/Position", "underscore"
             ud = b.data
             force = ud.boost #0.3;//(0.1 * dt);
             acc = Vec3F(b.rot.x * force, b.rot.y * force, 0)
-            out.push(evt.MoveObjTo(ud.id, Position(b.p.x, b.p.y, b.a), acc))
+            evt.ObjMoveTo.dispatch(ud.id, Position(b.p.x, b.p.y, b.a), acc)
+            ct++
         )
       finally
         _space.unlock(true)
+      ct
 
     forBody = (id, f) ->
       back = null
@@ -187,9 +130,8 @@ define(["r7/evt", "console", "chipmunk", "r7/Vec3F", "r7/Position", "underscore"
     spawnObj = (id, pos, gpof) ->
       return if !gpof.obj2dF?
       body = gpof.obj2dF()
-      p = pos
-      body.setPos(cp.v(p.x, p.y)) # = pos
-      body.setAngle(p.a)
+      body.setPos(cp.v(pos.x, pos.y)) # = pos
+      body.setAngle(pos.a)
       body.data = UserData(id, 0) #{ var id = id; var boost = false; };
       _space.addBody(body)
       _space.addShape(shape) for shape in body.shapes when shape?
@@ -197,10 +139,10 @@ define(["r7/evt", "console", "chipmunk", "r7/Vec3F", "r7/Position", "underscore"
       drawBody(body)
       body
 
-    spawnArea = (id, gpof) ->
+    spawnArea = (id, pos, gpof) ->
       obj2d = gpof.obj2dF()
-      obj2d.setPos(cp.v(0, 0))
-      obj2d.setAngle(0)
+      obj2d.setPos(cp.v(pos.x, pos.y))
+      obj2d.setAngle(pos.a)
       _space.staticBody = obj2d
       body = _space.staticBody
       body.data = UserData(id, false) #{ var id = id; var boost = false; };
@@ -234,7 +176,7 @@ define(["r7/evt", "console", "chipmunk", "r7/Vec3F", "r7/Position", "underscore"
             obj3d.add(mesh)
         obj3d
       #_pending.push(evt.SpawnObj(body.data.id+ '/debug/chipmun/boundingbox', (() -> Position(body.p.x, body.p.y, body.p.a)), obj3d))
-      _pending.push(evt.SpawnObj(body.data.id+ '>debug-physics', Position.zero, obj3dF))
+      evt.ObjSpawn.dispatch(body.data.id+ '>debug-physics', Position.zero, obj3dF)
 
     #TODO load from models
     ###
@@ -283,20 +225,39 @@ define(["r7/evt", "console", "chipmunk", "r7/Vec3F", "r7/Position", "underscore"
       body
     ###
 
-    ###
-    findAvailablePos = (newPos) ->
-      pos = null
-      if typeof newPos is "function"
-
-        #TODO avoid infinite loop
-        #        for(pos = newPos() ; isAvailable(pos) ; pos = newPos());
-        pos = Position(0, 0, 0)
-      else pos = newPos  if isAvailable(newPos)
-      throw "Can't find available pos : " + newPos  if pos is null
-      pos
-    ###
     newId = (base) ->
       base + new Date().getTime()
 
-    self
+    evt.GameInit.add(()->
+      _space = initSpace()
+    )
+    evt.GameStart.add(() ->
+      _running = true
+    )
+    evt.GameStop.add(() ->
+      _running = false
+    )
+    evt.AreaSpawn.add(spawnArea)
+    evt.BoostShipStart.add((objId) ->
+      setBoost(objId, 0.3)
+    )
+    evt.BoostShipStop.add((objId) ->
+      setBoost(objId, 0)
+    )
+    evt.RotateShipStart.add(setRotation)
+    evt.RotateShipStop.add((objId) -> setRotation(objId, 0))
+    #evt.RequestDirectShip.
+    #      setAngle(e.objId, Math.atan(e.acc.y / e.acc.x)) #TODO case div by zero
+    #      setBoost( e.objId, Math.sqrt(e.acc.y * e.acc.y + e.acc.x * e.acc.x))
+    #"ImpulseObj"
+    #      impulseObj(e.objId, e.angle, e.force)
+    evt.ObjSpawn.add(spawnObj)
+    evt.ObjDespawn.add(despawn)
+    evt.Tick.add((t, delta500) ->
+      if _running
+        update(t)
+        pushStates()
+        evt.Render.dispatch() # if hasChanges > 0
+    )
+    null
 )

@@ -1,13 +1,7 @@
 define(["dat"], (dat) ->
 
-  ###
-  @param {Element} container
-  ###
-  () ->
-    self = {}
+  (evt) ->
     _gui = new dat.GUI()
-    self.onEvent = (e, out) ->
-      e.setup(_gui) if e.k == "SetupDatGui"
-
-    self
+    evt.SetupDatGui.add((setup) -> setup(_gui))
+    null
 )

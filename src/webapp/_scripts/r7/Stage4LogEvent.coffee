@@ -1,8 +1,7 @@
 define([], () ->
 
-  (kinds) ->
-    self = {}
-    self.onEvent = (e, out) ->
-      console.log("LogEvent", e) if e.k in kinds
-    self
+  (evt, kinds) ->
+    for kind in kinds
+      evt[kind].add(() -> console.log("LogEvent", kind, arguments))
+    null
 )

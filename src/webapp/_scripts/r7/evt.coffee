@@ -1,160 +1,43 @@
-define([], ()->
+define(['signals'], (signals)->
 
   ###
   @constructor
   @return {evt}
   ###
   evt = {
-    Init: {
-      k: "Init"
-    }
-    Initialized : {
-      k: "Initialized"
-    }
-    DevMode : {
-      k: 'DevMode'
-    }
-    Start: {
-      k: "Start"
-    }
-    _lastTick : {
-      k: "Tick"
-      t: -1
-      delta500: 0
-    }
-    Tick: (t, delta500) ->
-      #reuse _lastTick (only one is available in the system) (OPTIM GC)
-      e = evt._lastTick
-      e.t = t
-      e.delta500 = (if (delta500 is 0) then 0 else (delta500 or null))
-      e
-    Render: {
-      k: "Render"
-    }
-    UpdateVal: (key, value) -> {
-      k: "UpdateVal"
-      key: key
-      value: value
-    }
-    IncVal: (key, inc) -> {
-      k: "IncVal"
-      key: key
-      inc: inc
-    }
-    ReqEvt: (e) -> {
-      k: "ReqEvt"
-      e: e
-    }
-    UnRegisterPeriodicEvt: (id) -> {
-      k: "UnRegisterPeriodicEvt"
-      id: id
-    }
-    RegisterPeriodicEvt: (id, interval, evt) -> {
-      k: "RegisterPeriodicEvt"
-      id: id
-      interval: interval
-      evt: evt
-    }
-    StartCountdown: (key, timeout, timeoutEvt) -> {
-      k: "StartCountdown"
-      key: key
-      timeout: timeout
-      timeoutEvt: timeoutEvt
-    }
-    StopCountdown: (key) -> {
-      k: "StopCountdown"
-      key: key
-    }
-    SetLocalDroneId: (objId) -> {
-      k : "SetLocalDroneId"
-      objId : objId
-    }
-    SpawnHud: (objId, domElem) -> {
-      k: "SpawnHud"
-      objId: objId
-      domElem : domElem
-    }
-    DespawnHud: (objId) -> {
-      k: "DespawnHud"
-      objId: objId
-    }
-    SpawnArea: (objId, pos, gpof) -> {
-      k: "SpawnArea"
-      objId: objId
-      pos: pos
-      gpof: gpof
-    }
-    ShootingStart: (emitterId) -> {
-      k: "ShootingStart"
-      emitterId: emitterId
-    }
-    ShootingStop: (emitterId) -> {
-      k: "ShootingStop"
-      emitterId: emitterId
-    }
-    FireBullet: (emitterId) -> {
-      k: "FireBullet"
-      emitterId: emitterId
-    }
-    SpawnObj: (objId, pos, gpof, options) -> {
-      k: "SpawnObj"
-      objId: objId
-      pos: pos
-      gpof: gpof
-      options: options
-    }
-    DespawnObj: (objId, options) -> {
-      k: "DespawnObj"
-      objId: objId
-      options: options
-    }
-    MoveObjTo: (objId, pos, acc) -> {
-      k: "MoveObjTo"
-      objId: objId
-      pos: pos
-      acc: acc
-    }
-    SetupDatGui: (setup) -> {
-      k: "SetupDatGui"
-      setup: setup
-    }
-    BoostShipStop: (objId) -> {
-      k: "BoostShipStop"
-      objId: objId
-    }
-    BoostShipStart: (objId) -> {
-      k: "BoostShipStart"
-      objId: objId
-    }
-    RotateShipStart: (objId, angleSpeed) -> {
-      k: "RotateShipStart"
-      objId: objId
-      angleSpeed: angleSpeed
-    }
-    RotateShipStop: (objId) -> {
-      k: "RotateShipStop"
-      objId: objId
-    }
-    BeginContact: (objId0, objId1) -> {
-      k: "BeginContact"
-      objId0: objId0
-      objId1: objId1
-    }
-    EndContact: (objId0, objId1) -> {
-      k: "EndContact"
-      objId0: objId0
-      objId1: objId1
-    }
-    ImpulseObj: (objId, angle, force) -> {
-      k: "ImpulseObj"
-      objId: objId
-      angle: angle
-      force: force
-    }
-    Stop: {
-      k: "Stop"
-    }
+    GameInit: new signals.Signal()
+    GameInitialized :new signals.Signal()
+    GameStart: new signals.Signal()
+    GameStop: new signals.Signal()#{
+    DevMode : new signals.Signal()
+    Tick: new signals.Signal()#(t, delta500) ->
+    Render: new signals.Signal()
+    ValUpdate: new signals.Signal()#(key, value) -> {
+    ValInc: new signals.Signal()#(key, inc) -> {
+    EvtReq: new signals.Signal()#(signal, arguments) -> {
+    PeriodicEvtDel: new signals.Signal()#(id) -> {
+    PeriodicEvtAdd: new signals.Signal()#(id, interval, signal, arguments) -> {
+    CountdownStart: new signals.Signal()#(key, timeout, signal, arguments) -> {
+    CountdownStop: new signals.Signal()#(key) -> {
+    SetLocalDroneId: new signals.Signal()#(objId) -> {
+    HudSpawn: new signals.Signal()#(objId, domElem) -> {
+    HudDespawn: new signals.Signal()#(objId) -> {
+    AreaSpawn: new signals.Signal()#(objId, pos, gpof) -> {
+    ShootingStart: new signals.Signal()#(emitterId) -> {
+    ShootingStop: new signals.Signal()#(emitterId) -> {
+    FireBullet: new signals.Signal()#(emitterId) -> {
+    ObjSpawn: new signals.Signal()#(objId, pos, gpof, options) -> {
+    ObjDespawn: new signals.Signal()#(objId, options) -> {
+    ObjMoveTo: new signals.Signal()#(objId, pos, acc) -> {
+    SetupDatGui: new signals.Signal()#(setup) -> {
+    BoostShipStop: new signals.Signal()#(objId) -> {
+    BoostShipStart: new signals.Signal()#(objId) -> {
+    RotateShipStart: new signals.Signal()#(objId, angleSpeed) -> {
+    RotateShipStop: new signals.Signal()#(objId) -> {
+    ContactBegin: new signals.Signal()#(objId0, objId1) -> {
+    ContactEnd: new signals.Signal()#(objId0, objId1) -> {
   }
+  ###
   evt.moveInto = (src, target) ->
     if src.length > 0 && src != target
       target.push.apply(target, src)
@@ -168,7 +51,7 @@ define([], ()->
       Array::push.apply(this, arguments)
 
     b
-
+  ###
   evt.newStates = () ->
     s = {}
     smax = {}
@@ -176,26 +59,26 @@ define([], ()->
     s.setMaxMin = (k, max, min) ->
       smax[k] = max if max?
       smin[k] = min if min?
-    s.update = (out, k, v, onUpdateState) ->
+    s.update = (k, v, onUpdateState) ->
       if s[k] isnt v
         s[k] = v
-        out.push(evt.UpdateVal(k, v))
-        onUpdateState(out, k, v)  if onUpdateState?
+        evt.ValUpdate.dispatch(k, v)
+        onUpdateState(k, v)  if onUpdateState?
 
-    s.inc = (out, k, i, onUpdateState) ->
+    s.inc = (k, i, onUpdateState) ->
       v = s[k] + i
       v = Math.min(smax[k], v) if smax[k]?
       v = Math.max(smin[k], v) if smin[k]?
-      s.update(out, k, v, onUpdateState)
+      s.update(k, v, onUpdateState)
 
     s
-
+  ###
   evt.extractK = (out, k, objIdPart) ->
     out.filter((v) ->
       b = (v.k is k)
       b = b and (not objIdPart? or (v.objId.indexOf(objIdPart) > -1))
       b
     )
-
+  ###
   evt
 )

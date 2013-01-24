@@ -1,4 +1,4 @@
-define(["r7/evt", "ko"], (evt, ko) ->
+define(["ko"], (ko) ->
 
   showScreen = (id) ->
     screens = document.getElementsByClassName('screen_info')
@@ -7,7 +7,7 @@ define(["r7/evt", "ko"], (evt, ko) ->
       screen.style.display = if (screen.id == id) then 'block' else 'none'
     false
 
-  ViewModel = (pending) ->
+  ViewModel = (evt) ->
     @score = ko.observable(0)
     @energy = ko.observable(50)
     @energyMax = ko.observable(100)
@@ -17,51 +17,47 @@ define(["r7/evt", "ko"], (evt, ko) ->
     @fireActive = ko.observable(false)
     @initialized =ko.observable(false)
     @start = () ->
-      console.log("START")
-      pending.push(evt.Start)
+      evt.GameStart.dispatch()
       showScreen('none')
     this
 
   ###
   @param {Element} container
   ###
-  (container) ->
-    self = {}
-    _pending = []
+  (evt, container) ->
     _shipIdP = "!"
-    _viewModel = new ViewModel(_pending)
+    _viewModel = new ViewModel(evt)
 
-    self.onEvent = (e, out) ->
-      switch e.k
-        when "Init"
-          showScreen('screenInit')
-          ko.applyBindings(_viewModel, container)
-          _viewModel.initialized(false)
-        when "Initialized"
-          _viewModel.initialized(true)
-          console.log("dummy")
-        when "SpawnHud"
-          document.getElementById("hud").appendChild(e.domElem) if e.domElem?
-          ko.applyBindings(_viewModel, container)
-        when "SetLocalDroneId"
-          _shipIdP = e.objId + "/"
-        when "UpdateVal"
-          if e.key.indexOf(_shipIdP) is 0
-            fieldName = e.key.substring(_shipIdP.length)
-            field = _viewModel[fieldName]
-            field(e.value) if field?
-          else if e.key is "countdown"
-            totalSec = Math.floor(e.value)
-            minutes = parseInt(totalSec / 60, 10)
-            seconds = parseInt(totalSec % 60, 10)
-            result = (
-              (if minutes < 10 then "0" + minutes else minutes)
-              + ":"
-              + (if seconds < 10 then "0" + seconds else seconds)
-            )
-            _viewModel.countdown(result)
-        else
-          # pass
-      evt.moveInto(_pending, out)
-    self
+    evt.GameInit.add(()->
+      showScreen('screenInit')
+      ko.applyBindings(_viewModel, container)
+      _viewModel.initialized(false)
+    )
+    evt.GameInitialized.add(()->
+      _viewModel.initialized(true)
+    )
+    evt.HudSpawn.add((objId, domElem)->
+      document.getElementById("hud").appendChild(domElem) if domElem?
+      ko.applyBindings(_viewModel, container)
+    )
+    evt.SetLocalDroneId.add((objId)->
+      _shipIdP = objId + "/"
+    )
+    evt.ValUpdate.add((key, value) ->
+      if key.indexOf(_shipIdP) is 0
+        fieldName = key.substring(_shipIdP.length)
+        field = _viewModel[fieldName]
+        field(value) if field?
+      else if key is "countdown"
+        totalSec = Math.floor(value)
+        minutes = parseInt(totalSec / 60, 10)
+        seconds = parseInt(totalSec % 60, 10)
+        result = (
+          (if minutes < 10 then "0" + minutes else minutes)
+          + ":"
+          + (if seconds < 10 then "0" + seconds else seconds)
+        )
+        _viewModel.countdown(result)
+    )
+    null
 )

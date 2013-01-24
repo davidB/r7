@@ -1,69 +1,24 @@
-define(["r7/evt", "r7/Position", "r7/assetsLoader", "underscore", "Q"], (evt, Position, assetsLoader, _, Q) ->
+define(["r7/Position", "r7/assetsLoader", "underscore", "Q"], (Position, assetsLoader, _, Q) ->
 
   ###
   @param {Element} container
   ###
-  ->
-    self = {}
-    _pending = evt.newListOfEvt()
+  (evt) ->
     _shipId = "!"
     _states = evt.newStates()
     _uid = new Date().getTime()
-    self.onEvent = (e, out) ->
-      switch e.k
-        when "Init"
-          assets = _.map(
-            [
-              {kind : 'area', id : 'area01'},
-              {kind : 'model', id : 'ship01'},
-              {kind : 'model', id : 'targetg101'},
-              {kind : 'hud',   id : 'gui'}
-            ],
-            (x) -> assetsLoader.preload(x.id, x.kind)
-          )
-          Q.all(assets).then((x) ->
-            _pending.push(evt.Initialized)
-          )
-        when "Start"
-          start()
-        when "ReqEvt"
-          onReqEvent(e.e)
-        when "BeginContact"
 
-          if e.objId0.indexOf("area/") is 0
-            if e.objId1.indexOf("ship/") is 0
-
-
-            # crash if no shield
-            else e.objId1.indexOf("ship/1-b") is 0
-
-        # despawn bullet
-
-        #if (e.objId0 === 'ship/1' && e.objId1 === 'target-g1/1') {
-        #TODO move some game rule from targetG1 here ?
-        #out.push(incState('ship-1.score', 1));
-        #}
-        when "Tick"
-
-          updateEnergy(e.delta500)  if _states.running and e.delta500 >= 1
-
-        # if boost decrease energy
+      # if boost decrease energy
         # if shield decrease energy
         # else increase energy
         # if no energy, stop boost, shield,...
-        when "Stop"
-          updateState("running", false)
-        else
-
-      # pass
-      evt.moveInto(_pending, out)
 
     start = () ->
       _shipId = "ship/" + (_uid + 1)
-      _pending.push(evt.SetLocalDroneId(_shipId))
-      assetsLoader.find('gui'   ).then((x) -> _pending.push(evt.SpawnHud('hud', x))).done()
-      assetsLoader.find('area01').then((x) -> _pending.push(evt.SpawnArea("area/" + _uid, Position.zero, x.walls))).done()
-      assetsLoader.find('ship01').then((x) -> _pending.push(evt.SpawnObj(_shipId, Position(0.0, 0.0, 0.5), x))).done()
+      evt.SetLocalDroneId.dispatch(_shipId)
+      assetsLoader.find('gui'   ).then((x) -> evt.HudSpawn.dispatch('hud', x)).done()
+      assetsLoader.find('area01').then((x) -> evt.AreaSpawn.dispatch("area/" + _uid, Position.zero, x.walls)).done()
+      assetsLoader.find('ship01').then((x) -> evt.ObjSpawn.dispatch(_shipId, Position(0.0, 0.0, 0.5), x)).done()
       updateState("running", false)
       updateState(_shipId + "/score", 0)
       updateState(_shipId + "/energy", 500)
@@ -72,47 +27,47 @@ define(["r7/evt", "r7/Position", "r7/assetsLoader", "underscore", "Q"], (evt, Po
       updateState(_shipId + "/shooting", false)
       updateState(_shipId + "/shielding", false)
       updateState("running", true)
-      _pending.push(evt.StartCountdown("countdown", 45, evt.Stop))
-      _pending.push(evt.Render)
+      evt.CountdownStart.dispatch("countdown", 45, evt.GameStop, [])
+      evt.Render.dispatch()
 
-    onReqEvent = (e) ->
-      switch e.k
-        when "UpdateVal"
-          updateState(e.key, e.value)
+    onReqEvent = (signal, args) ->
+      switch signal
+        when evt.ValUpdateVal
+          updateState(args[0], args[1])
 
         #ignore
-        when "IncVal"
-          incState(e.key, e.inc)  if e.key.indexOf(_shipId) is 0
-        when "BoostShipStart"
-          _pending.push(e)
-          updateState(_shipId + "/boosting", true)  if e.objId is _shipId
-        when "BoostShipStop"
-          _pending.push(e)
-          updateState(_shipId + "/boosting", false)  if e.objId is _shipId
-        when "ShootingStart"
-          _pending.push(e)
-          _pending.push(evt.RegisterPeriodicEvt(_shipId + "-fire", 300, evt.ReqEvt(evt.FireBullet(_shipId))))  if e.emitterId is _shipId
-        when "ShootingStop"
-          _pending.push(e)
-          _pending.push(evt.UnRegisterPeriodicEvt(_shipId + "-fire"))  if e.emitterId is _shipId
-        when "FireBullet"
-          if e.emitterId isnt _shipId
-            _pending.push(e)
+        when evt.ValInc
+          incState(args[0], args[1])  if args[0].indexOf(_shipId) is 0
+        when evt.BoostShipStart
+          signal.dispatch.apply(this, args)
+          updateState(_shipId + "/boosting", true)  if args[0] is _shipId
+        when evt.BoostShipStop
+          signal.dispatch.apply(this, args)
+          updateState(_shipId + "/boosting", false)  if args[0] is _shipId
+        when evt.ShootingStart
+          signal.dispatch.apply(this, args)
+          evt.PeriodicEvtAdd.dispatch(_shipId + "-fire", 300, evt.EvtReq, [evt.FireBullet, [_shipId]])  if args[0] is _shipId
+        when evt.ShootingStop
+          signal.dispatch.apply(this, args)
+          evt.PeriodicEvtDel.dispatch(_shipId + "-fire")  if args[0] is _shipId
+        when evt.FireBullet
+          if args[0] isnt _shipId
+            signal.dispatch.apply(this, args)
           else
             if _states[_shipId + "/energy"] > 7
               incState(_shipId + "/energy", -7)
-              _pending.push(e)
+              signal.dispatch.apply(this, args)
         else
-          _pending.push(e)
+          signal.dispatch.apply(this, args)
 
     incState = (k, v) ->
-      _states.inc(_pending, k, v, onUpdateState)
+      _states.inc(k, v, onUpdateState)
 
     updateState = (k, v) ->
-      _states.update(_pending, k, v, onUpdateState)
+      _states.update(k, v, onUpdateState)
 
-    onUpdateState = (out, k, v) ->
-      onReqEvent(evt.BoostShipStop(_shipId))  if _states[_shipId + "/boosting"]  if k is _shipId + "/energy" and v is 0
+    onUpdateState = (k, v) ->
+      onReqEvent(evt.BoostShipStop, [_shipId])  if _states[_shipId + "/boosting"]  if k is _shipId + "/energy" and v is 0
 
     updateEnergy = (delta) ->
       k = _shipId + "/energy"
@@ -126,5 +81,27 @@ define(["r7/evt", "r7/Position", "r7/assetsLoader", "underscore", "Q"], (evt, Po
       v = Math.min(_states[k + "Max"], Math.max(0, v + unit))
       updateState(k, v)
 
-    self
+    evt.GameInit.add(() ->
+      assets = _.map(
+        [
+          {kind : 'area', id : 'area01'},
+          {kind : 'model', id : 'ship01'},
+          {kind : 'model', id : 'targetg101'},
+          {kind : 'hud',   id : 'gui'}
+        ],
+        (x) -> assetsLoader.preload(x.id, x.kind)
+      )
+      Q.all(assets).then((x) ->
+        evt.GameInitialized.dispatch()
+      )
     )
+    evt.GameStart.add(start)
+    evt.EvtReq.add(onReqEvent)
+    evt.Tick.add((t, delta500) ->
+      updateEnergy(delta500)  if _states.running and delta500 >= 1
+    )
+    evt.GameStop.add(() ->
+      updateState("running", false)
+    )
+    null
+)

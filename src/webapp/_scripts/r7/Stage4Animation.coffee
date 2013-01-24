@@ -1,19 +1,12 @@
 define(
-  ['TWEEN', 'console', 'r7/evt'],
-  (TWEEN, console, evt) ->
-    back = () ->
-      self = {}
-      self.onEvent = (e, out) ->
-        switch e.k
+  ['TWEEN', 'console'],
+  (TWEEN, console) ->
+    back = (evt) ->
+      evt.GameStart.add(TWEEN.removeAll)
+      evt.GameStop.add(TWEEN.removeAll)
+      evt.Tick.add((t, delta500) -> TWEEN.update(t))
+      null
 
-          #TODO initialize/reset
-          when "Start", "Stop"
-            TWEEN.removeAll()
-          when "Tick"
-            TWEEN.update(e.t)
-          else
-            # pass
-      self
     back.scaleIn = (obj3d, onComplete) ->
       tween = (
         new TWEEN.Tween({x : 0, y : 0, z : 0})
@@ -35,9 +28,7 @@ define(
         .delay(0)
         .easing(TWEEN.Easing.Quadratic.In)
         .onUpdate(() ->
-          obj3d.scale.x = this.x
-          obj3d.scale.y = this.y
-          obj3d.scale.z = this.z
+          obj3d.scale.set(this.x, this.y, this.z)
         )
       )
       tween.onComplete(() -> onComplete(obj3d)) if onComplete?
