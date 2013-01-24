@@ -63,13 +63,14 @@ define(
       else
 
         #TODO display message if Webgl required
-        _renderer = new THREE.CanvasRenderer()
+        #_renderer = new THREE.CanvasRenderer()
+        throw new Exception('WebGL unsupported')
 
       _renderer.shadowMapEnabled = true
       #_renderer.shadowMapSoft = true # to antialias the shadow
       _renderer.shadowMapType = THREE.PCFShadowMap
       _renderer.setClearColorHex(0xEEEEEE, 1.0)
-      _renderer.autoClear = false
+      _renderer.autoClear = true
       _renderer.clear()
 
       updateViewportSize = (event) ->
@@ -160,7 +161,7 @@ define(
           #
           #_cameraControls.update()
           nLookAt(_camera, obj.position) if obj? and _camera.gameDriven
-          _renderer.clear()
+          #_renderer.clear()
           _renderer.render(_scene, _camera)
 
       addLights = (scene, camera) ->
