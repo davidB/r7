@@ -5,6 +5,6 @@ define(
       Stage4UserInput(evt)
       Stage4Animation(evt)
       Stage4Render(evt, container)
-      #Stage4Layer2D(window.document.getElementById('layer2D')).onEvent
-      Stage4Layer2D(evt, container)
+      Stage4Layer2D(evt, window.document.getElementById('game_area'))
+      #Stage4Layer2D(evt, container)
 )

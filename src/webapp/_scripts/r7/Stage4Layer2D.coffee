@@ -8,6 +8,8 @@ define(["ko"], (ko) ->
     false
 
   ViewModel = (evt) ->
+    @progressMax = ko.observable(0)
+    @progressCurrent = ko.observable(0)
     @score = ko.observable(0)
     @energy = ko.observable(50)
     @energyMax = ko.observable(100)
@@ -58,6 +60,10 @@ define(["ko"], (ko) ->
           + (if seconds < 10 then "0" + seconds else seconds)
         )
         _viewModel.countdown(result)
+    )
+    evt.LoadProgress.add((current, max) ->
+      _viewModel.progressMax(max)
+      _viewModel.progressCurrent(current)
     )
     null
 )

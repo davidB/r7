@@ -1,10 +1,11 @@
-define(["console", "THREE", "chipmunk", "underscore", 'preloadjs', 'Q', 'r7/Stage4Animation'], (console, THREE, cp, _, PreloadJS, Q, animations) ->
+define(["console", "THREE", "chipmunk", "underscore", 'preloadjs', 'Q', 'r7/Stage4Animation', 'r7/evt'], (console, THREE, cp, _, PreloadJS, Q, animations, evt) ->
 
   _preload = new PreloadJS()
   _preload.onFileLoad = (e) ->
     console.log("preload onFileLoad", e)
     e.data.resolve(e)
-  _preload.onProgress = (e) -> console.log("preload onProgress", e)
+  _preload.onProgress = (e) ->
+    console.log("preload onProgress", e)
   _preload.onFileProgress = (e) -> console.log("preload onFileProgress", e)
   _preload.onError = (e) ->
     console.error("preload onError", e)
@@ -271,7 +272,16 @@ define(["console", "THREE", "chipmunk", "underscore", 'preloadjs', 'Q', 'r7/Stag
       obj2d : { box : [rx, ry] }
     }
 
+  progressCurrent = 0
+  progressMax = 0
+
   preload = (id, kind, src) ->
+    if (progressMax == progressCurrent)
+      progressMax = 0
+      progressCurrent = 0
+    progressMax += 1
+    evt.LoadProgress.dispatch(progressCurrent, progressMax)
+
     defer = Q.defer()
     result = defer.promise
     manifest = switch kind
@@ -306,6 +316,11 @@ define(["console", "THREE", "chipmunk", "underscore", 'preloadjs', 'Q', 'r7/Stag
       manifest.id = id
       manifest.data = defer
       _preload.loadFile(manifest, true)
+    result = result.then((x) ->
+      progressCurrent += 1
+      evt.LoadProgress.dispatch(progressCurrent, progressMax)
+      x
+    )
     _cache[id] = result
     result
 

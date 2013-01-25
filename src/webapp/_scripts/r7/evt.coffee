@@ -36,6 +36,7 @@ define(['signals'], (signals)->
     RotateShipStop: new signals.Signal()#(objId) -> {
     ContactBegin: new signals.Signal()#(objId0, objId1) -> {
     ContactEnd: new signals.Signal()#(objId0, objId1) -> {
+    LoadProgress: new signals.Signal()
   }
   ###
   evt.moveInto = (src, target) ->
