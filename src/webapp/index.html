@@ -46,6 +46,9 @@
       -webkit-box-shadow:0px 0px 20px #111;
       -khtml-box-shadow:0px 0px 20px #111;
     }
+    .container, .navbar-static-top .container, .navbar-fixed-top .container, .navbar-fixed-bottom .container {
+      width: 1120px;
+    }
     #game_area {
       position: relative;
       width: 1120px;
@@ -131,6 +134,11 @@
       -ms-transition: all 1s;
       transition: all 1s;
     }
+    footer {
+      padding: 0;
+      margin: auto;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -187,7 +195,8 @@
     <progress max="100" value="0" class="gameload" data-bind="attr: { max: progressMax(), value: progressCurrent()}">
       <span id="progressFallback" data-bind="text : (progressCurrent() * 100 / progressMax()) + '%'"></span>
     </progress>
-  </section>
+    </section>
+    <footer>version: 0.2.1</footer>
   </div>
   <script>
     require(['main'], function(main){ main(); });
